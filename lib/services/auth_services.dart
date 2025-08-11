@@ -1,0 +1,136 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:remiender_app/Provider/user_provider.dart';
+import 'package:remiender_app/models/user.dart';
+import 'package:remiender_app/pages/home_screen.dart';
+import 'package:remiender_app/utils/constants.dart';
+import 'package:remiender_app/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class AuthServices {
+  void signUpUser({
+    required BuildContext context,
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    try {
+      User user = User(
+        id: '',
+        name: name,
+        email: email,
+        token: '',
+        password: password,
+      );
+      http.Response res = await http.post(
+        Uri.parse('${Constants.uri}/api/signup'),
+        body: user.toJson(),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(
+            context,
+            'Account created! Login with the same credentials!',
+          );
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
+  //sign In
+  void signInUser({
+    required BuildContext context,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      var userProvider = Provider.of<UserProvideer>(context, listen: false);
+      final navigator = Navigator.of(context);
+
+      http.Response res = await http.post(
+        Uri.parse('${Constants.uri}/api/signin'),
+        body: jsonEncode({'email': email, 'password': password}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () async {
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          userProvider.setUser(res.body);
+          await pref.setString('x-auth-token', jsonDecode(res.body)['token']);
+          navigator.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (route) => false,
+          );
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
+  void getUserData(BuildContext context) async {
+    try {
+      var userProvider = Provider.of<UserProvideer>(context, listen: false);
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('x-auth-token');
+
+      // Check if token exists and is not empty
+      if (token == null || token.isEmpty) {
+        await pref.setString('x-auth-token', '');
+        return; // Exit early if no token
+      }
+
+      // Validate token
+      var tokenRes = await http.post(
+        Uri.parse('${Constants.uri}/api/tokenIsValid'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      var response = jsonDecode(tokenRes.body);
+
+      if (response == true) {
+        // Fetch user data with the token
+        http.Response userRes = await http.get(
+          Uri.parse('${Constants.uri}/api/user'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'x-auth-token': token,
+          },
+        );
+
+        if (userRes.statusCode == 200) {
+          userProvider.setUser(userRes.body);
+        } else {
+          // If user data fetch fails, clear the token
+          await pref.setString('x-auth-token', '');
+        }
+      } else {
+        // If token is invalid, clear it
+        await pref.setString('x-auth-token', '');
+      }
+    } catch (e) {
+      // If any error occurs, clear the token and show error
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      await pref.setString('x-auth-token', '');
+      showSnackBar(context, 'Authentication error: ${e.toString()}');
+    }
+  }
+
+  
+}
