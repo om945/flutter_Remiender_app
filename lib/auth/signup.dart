@@ -14,6 +14,9 @@ class SignupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screeenWidth = MediaQuery.of(context).size.width;
+    final screeenHeight = MediaQuery.of(context).size.height;
+
     void signupUser() {
       authService.signUpUser(
         context: context,
@@ -25,83 +28,187 @@ class SignupPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(backgroundColor: bgColor),
+      // appBar: AppBar(backgroundColor: bgColor),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: SizedBox(
+          height: screeenHeight,
+          child: Stack(
             children: [
-              Text(
-                'Create your account',
-                style: TextStyle(
-                  color: blueColor,
-                  fontSize: 28.sp,
-                  fontFamily: googleFontBold,
-                ),
-                textAlign: TextAlign.start,
+              Container(
+                width: screeenWidth,
+                height: screeenHeight * 0.45,
+                decoration: BoxDecoration(color: blueColor),
               ),
-              SizedBox(height: 50.h),
-              Textfield(
-                controller: userName,
-                lableText: "Enter username",
-                hintText: "username",
-                obscureText: false,
-              ),
-              SizedBox(height: 10.h),
-              Textfield(
-                controller: email,
-                lableText: "Enter email",
-                hintText: "email",
-                obscureText: false,
-              ),
-              SizedBox(height: 10.h),
-              Textfield(
-                controller: password,
-                lableText: "Enter password",
-                hintText: "password",
-                obscureText: true,
-              ),
-              SizedBox(height: 80.h),
-              Custombutton(title: 'Sign Up', action: signupUser),
-              SizedBox(height: 8.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Already have an account?",
-                    style: TextStyle(
+              Positioned(
+                top: screeenHeight * 0.25,
+                left: 0,
+                right: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    width: screeenWidth,
+                    decoration: BoxDecoration(
                       color: whiteColor,
-                      fontFamily: googleFontNormal,
-                      fontSize: 15.sp,
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
-                  ),
-                  InkWell(
-                    canRequestFocus: false,
-                    enableFeedback: false,
-                    splashColor: Colors.black,
-                    focusColor: Colors.black,
-                    borderRadius: BorderRadius.circular(15.r),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => SigninPage()),
-                      );
-                    },
-                    child: Text(
-                      " Sign In",
-                      style: TextStyle(
-                        color: whiteColor,
-                        fontFamily: googleFontNormal,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(25, 25, 25, 25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Text(
+                          //   'Create your account',
+                          //   style: TextStyle(
+                          //     color: blueColor,
+                          //     fontSize: 28.sp,
+                          //     fontFamily: googleFontBold,
+                          //   ),
+                          //   textAlign: TextAlign.start,
+                          // ),
+                          // SizedBox(height: 50.h),
+                          Textfield(
+                            controller: userName,
+                            lableText: "Enter username",
+                            hintText: "username",
+                            obscureText: false,
+                          ),
+                          SizedBox(height: 5.h),
+                          Textfield(
+                            controller: email,
+                            lableText: "Enter email",
+                            hintText: "email",
+                            obscureText: false,
+                          ),
+                          SizedBox(height: 10.h),
+                          Textfield(
+                            controller: password,
+                            lableText: "Enter password",
+                            hintText: "password",
+                            obscureText: true,
+                          ),
+                          SizedBox(height: 50.h),
+                          Custombutton(title: 'Sign Up', action: signupUser),
+                          SizedBox(height: 8.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Already have an account?",
+                                style: TextStyle(
+                                  color: bgColor,
+                                  fontFamily: googleFontNormal,
+                                  fontSize: 15.sp,
+                                ),
+                              ),
+                              InkWell(
+                                canRequestFocus: false,
+                                enableFeedback: false,
+                                splashColor: Colors.black,
+                                focusColor: Colors.black,
+                                borderRadius: BorderRadius.circular(15.r),
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => SigninPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  " Sign In",
+                                  style: TextStyle(
+                                    color: bgColor,
+                                    fontFamily: googleFontNormal,
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
             ],
           ),
         ),
+        // child: Padding(
+        //   padding: const EdgeInsets.all(25.0),
+        //   child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Text(
+        //         'Create your account',
+        //         style: TextStyle(
+        //           color: blueColor,
+        //           fontSize: 28.sp,
+        //           fontFamily: googleFontBold,
+        //         ),
+        //         textAlign: TextAlign.start,
+        //       ),
+        //       SizedBox(height: 50.h),
+        //       Textfield(
+        //         controller: userName,
+        //         lableText: "Enter username",
+        //         hintText: "username",
+        //         obscureText: false,
+        //       ),
+        //       SizedBox(height: 10.h),
+        //       Textfield(
+        //         controller: email,
+        //         lableText: "Enter email",
+        //         hintText: "email",
+        //         obscureText: false,
+        //       ),
+        //       SizedBox(height: 10.h),
+        //       Textfield(
+        //         controller: password,
+        //         lableText: "Enter password",
+        //         hintText: "password",
+        //         obscureText: true,
+        //       ),
+        //       SizedBox(height: 80.h),
+        //       Custombutton(title: 'Sign Up', action: signupUser),
+        //       SizedBox(height: 8.h),
+        //       Row(
+        //         mainAxisAlignment: MainAxisAlignment.center,
+        //         children: [
+        //           Text(
+        //             "Already have an account?",
+        //             style: TextStyle(
+        //               color: whiteColor,
+        //               fontFamily: googleFontNormal,
+        //               fontSize: 15.sp,
+        //             ),
+        //           ),
+        //           InkWell(
+        //             canRequestFocus: false,
+        //             enableFeedback: false,
+        //             splashColor: Colors.black,
+        //             focusColor: Colors.black,
+        //             borderRadius: BorderRadius.circular(15.r),
+        //             onTap: () {
+        //               Navigator.of(context).push(
+        //                 MaterialPageRoute(builder: (context) => SigninPage()),
+        //               );
+        //             },
+        //             child: Text(
+        //               " Sign In",
+        //               style: TextStyle(
+        //                 color: whiteColor,
+        //                 fontFamily: googleFontNormal,
+        //                 fontSize: 15.sp,
+        //                 fontWeight: FontWeight.w700,
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ),
     );
   }
@@ -129,7 +236,7 @@ class Textfield extends StatelessWidget {
         Text(
           lableText,
           style: TextStyle(
-            color: whiteColor,
+            color: bgColor,
             fontFamily: googleFontSemiBold,
             fontSize: 16.sp,
           ),
@@ -142,7 +249,7 @@ class Textfield extends StatelessWidget {
           cursorColor: blueColor,
           style: TextStyle(
             fontSize: 14.sp,
-            color: whiteColor,
+            color: bgColor,
             fontFamily: googleFontFaintNormal,
             fontWeight: FontWeight.w600,
           ),
