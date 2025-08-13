@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// Note: The import for SigninPage is no longer needed.
-// import 'package:remiender_app/auth/signin.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
 
@@ -67,8 +65,37 @@ class _SignupPageState extends State<SignupPage> {
                 height: screeenHeight * 0.45,
                 decoration: BoxDecoration(color: blueColor),
               ),
+              _isSignupView
+                  ? Positioned(
+                      top: screeenHeight * 0.14,
+                      right: 0,
+                      left: 0,
+                      child: Text(
+                        'Hello...\nCreate an Account',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: blackColor,
+                          fontFamily: googleFontBold,
+                          fontSize: 30.sp,
+                        ),
+                      ),
+                    )
+                  : Positioned(
+                      top: screeenHeight * 0.14,
+                      right: 0,
+                      left: 0,
+                      child: Text(
+                        'Welcome back!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: blackColor,
+                          fontFamily: googleFontBold,
+                          fontSize: 30.sp,
+                        ),
+                      ),
+                    ),
               Positioned(
-                top: screeenHeight * 0.20, // Adjusted top position
+                top: screeenHeight * 0.25, // Adjusted top position
                 left: 0,
                 right: 0,
                 child: Padding(
