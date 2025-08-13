@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
-import 'package:remiender_app/auth/signup.dart';
+import 'package:remiender_app/auth/auth.dart';
 import 'package:remiender_app/pages/home_screen.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';

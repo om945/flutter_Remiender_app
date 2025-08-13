@@ -17,7 +17,7 @@ String? googleFontFaintNormal = GoogleFonts.dmSans(
   color: Color.fromRGBO(191, 184, 176, 100),
 ).fontFamily;
 
-const Color blueColor = Color.fromRGBO(118, 199, 210, 1);
+const Color blueColor = Color.fromRGBO(92, 188, 201, 1);
 const Color blackColor = Color.fromRGBO(30, 30, 30, 1);
 const Color bgColor = Color.fromRGBO(52, 53, 58, 1);
 const Color whiteColor = Color.fromRGBO(217, 217, 217, 1);
