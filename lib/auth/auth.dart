@@ -29,18 +29,20 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  void signupUser() {
+  void signupUser() async {
     authService.signUpUser(
       context: context,
       email: email.text,
       password: password.text,
       name: userName.text,
     );
+    userName.clear();
+    email.clear();
+    password.clear();
   }
 
-  // 3. Added a function for signing in
+  //function for signing in
   void signinUser() {
-    // Make sure you have a `signInUser` method in your AuthServices class
     authService.signInUser(
       context: context,
       email: email.text,

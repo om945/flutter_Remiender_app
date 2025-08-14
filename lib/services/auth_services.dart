@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
+import 'package:remiender_app/auth/auth.dart';
 import 'package:remiender_app/models/user.dart';
-import 'package:remiender_app/pages/home_screen.dart';
+import 'package:remiender_app/pages/home_page.dart';
 import 'package:remiender_app/utils/constants.dart';
 import 'package:remiender_app/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,13 +82,12 @@ class AuthServices {
     }
   }
 
-  void getUserData(BuildContext context) async {
+  Future<void> getUserData(BuildContext context) async {
     try {
       var userProvider = Provider.of<UserProvideer>(context, listen: false);
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('x-auth-token');
-
-      // Check if token exists and is not empty
+      
       if (token == null || token.isEmpty) {
         await pref.setString('x-auth-token', '');
         return; // Exit early if no token
@@ -132,5 +132,23 @@ class AuthServices {
     }
   }
 
-  
+  void signOutUser(BuildContext context) async {
+    try {
+      final navigator = Navigator.of(context);
+      final userProvider = Provider.of<UserProvideer>(context, listen: false);
+
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      await pref.setString('x-auth-token', '');
+      userProvider.setUserFromModel(
+        User(id: '', name: '', email: '', token: '', password: ''),
+      );
+
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const SignupPage()),
+        (route) => false,
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
 }

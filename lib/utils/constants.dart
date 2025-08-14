@@ -1,3 +1,3 @@
 class Constants {
-  static String uri = 'https://ddefc3875671.ngrok-free.app';
+  static String uri = 'https://973d59c5d7fd.ngrok-free.app';
 }
