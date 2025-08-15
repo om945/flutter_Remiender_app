@@ -4,8 +4,9 @@ import User from '../models/user.js';
 async function handleGenerateNewNote(req, res) {
   const { headline, content } = req.body;
   try {
-    const userId = req.User;
-    const user = await User.findOne({ userId });
+    const userId = req.user;
+    // console.log(req.user);
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
