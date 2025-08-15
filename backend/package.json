@@ -8,7 +8,7 @@
   "name": "flutter_notepad_backend",
   "version": "1.0.0",
   "main": "index.js",
-  "tyep": "module",
+  "type": "module",
   "scripts": {
     "dev": "nodemon ./index.js",
     "start": "node ./index.js"

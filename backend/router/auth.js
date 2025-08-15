@@ -1,9 +1,10 @@
-const express = require('express');
+import express from 'express';
+import bcryptjs from 'bcryptjs';
+import User from '../models/user.js';
+import jwt from 'jsonwebtoken';
+import auth from '../middleware/auth.js';
+
 const authRouter = express.Router();
-const bcryptjs = require('bcryptjs');
-const User = require('../models/user');
-const jwt = require('jsonwebtoken');
-const auth = require('../middleware/auth');
 
 //Sign Up
 authRouter.post('/api/signup', async (req, res) => {
@@ -81,4 +82,4 @@ authRouter.get('/api/user', auth, async (req, res) => {
   }
 });
 
-module.exports = authRouter;
+export default authRouter;
