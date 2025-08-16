@@ -30,4 +30,15 @@ async function handleGenerateNewNote(req, res) {
   }
 }
 
-export default handleGenerateNewNote;
+async function handleGetNotes(req, res) {
+  try {
+    const userId = req.user;
+    const notes = await Note.find({ userId });
+    if (!notes) return res.status(500).json({ error: 'something went' });
+    res.json(notes);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
+export { handleGenerateNewNote, handleGetNotes };

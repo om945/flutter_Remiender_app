@@ -3,12 +3,28 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:remiender_app/services/note_service.dart';
 import 'package:remiender_app/theme/theme.dart';
 
-class AddNotePage extends StatelessWidget {
+class AddNotePage extends StatefulWidget {
+  const AddNotePage({super.key});
+
+  @override
+  State<AddNotePage> createState() => _AddNotePageState();
+}
+
+class _AddNotePageState extends State<AddNotePage> {
   final TextEditingController headlineController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
-  AddNotePage({super.key});
+  final NoteService noteService = NoteService();
+
+  void addNote() async {
+    noteService.addNote(
+      context: context,
+      headline: headlineController.text,
+      content: contentController.text,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +33,7 @@ class AddNotePage extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.share)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.save_alt_rounded)),
+          IconButton(onPressed: addNote, icon: Icon(Icons.save_alt_rounded)),
         ],
       ),
       body: SingleChildScrollView(

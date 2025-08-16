@@ -87,7 +87,7 @@ class AuthServices {
       var userProvider = Provider.of<UserProvideer>(context, listen: false);
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('x-auth-token');
-      
+
       if (token == null || token.isEmpty) {
         await pref.setString('x-auth-token', '');
         return; // Exit early if no token
