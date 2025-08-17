@@ -5,20 +5,27 @@ class Notes {
   final String userId;
   final String headline;
   final String content;
+  final DateTime? uploadTime;
 
   Notes({
     required this.id,
     required this.userId,
     required this.headline,
     required this.content,
+    this.uploadTime,
   });
 
   factory Notes.fromJson(Map<String, dynamic> json) {
     return Notes(
-      id: json['id'],
-      userId: json['userId'],
-      headline: json['headline'],
-      content: json['content'],
+      id: json['_id']?.toString() ?? '',
+      userId: json['userId']?.toString() ?? '',
+      headline: json['headline']?.toString() ?? '',
+      content: json['content']?.toString() ?? '',
+      uploadTime: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString())
+          : json['uploadedAt'] != null
+          ? DateTime.tryParse(json['uploadedAt'].toString())
+          : null,
     );
   }
 
@@ -28,6 +35,7 @@ class Notes {
       'userId': userId,
       'headline': headline,
       'content': content,
+      'uploadTime': uploadTime?.toIso8601String(),
     };
   }
 }

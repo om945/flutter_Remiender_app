@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
+import 'package:remiender_app/Provider/notes_provider.dart';
 import 'package:remiender_app/auth/auth.dart';
 import 'package:remiender_app/pages/home_page.dart';
 import 'package:remiender_app/services/auth_services.dart';
@@ -11,7 +12,10 @@ import 'package:remiender_app/theme/theme.dart';
 void main() {
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserProvideer())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => NotesProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -76,7 +80,7 @@ class _MyAppState extends State<MyApp> {
                   child: CircularProgressIndicator(color: blueColor),
                 ),
               )
-            : Consumer<UserProvideer>(
+            : Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
                   return userProvider.user.token.isEmpty
                       ? const SignupPage()

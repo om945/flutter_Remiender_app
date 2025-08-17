@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,11 +18,20 @@ class _AddNotePageState extends State<AddNotePage> {
   final NoteService noteService = NoteService();
 
   void addNote() async {
-    noteService.addNote(
+    await noteService.addNote(
       context: context,
-      headline: headlineController.text,
-      content: contentController.text,
+      headline: headlineController.text.trim(),
+      content: contentController.text.trim(),
     );
+
+    // Refresh the notes list
+    if (mounted) {
+      // final notesProvider = Provider.of<NotesProvider>(context, listen: false);
+      // await notesProvider.fetchnotesForUser(context);
+
+      // Navigate back to the notes list
+      Navigator.of(context).pop(true);
+    }
   }
 
   @override

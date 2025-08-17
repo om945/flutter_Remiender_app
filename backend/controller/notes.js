@@ -34,9 +34,11 @@ async function handleGetNotes(req, res) {
   try {
     const userId = req.user;
     const notes = await Note.find({ userId });
-    if (!notes) return res.status(500).json({ error: 'something went' });
+    // notes will be an array, even if empty, so we don't need to check if it's falsy
+    // console.log('Notes found:', notes);
     res.json(notes);
   } catch (e) {
+    console.error('Error in handleGetNotes:', e);
     res.status(500).json({ error: e.message });
   }
 }

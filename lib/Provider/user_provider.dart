@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:remiender_app/models/user.dart';
 
-class UserProvideer extends ChangeNotifier {
+class UserProvider extends ChangeNotifier {
   User _user = User(id: "", name: "", email: "", token: "", password: "");
 
   User get user => _user;

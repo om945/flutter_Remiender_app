@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:remiender_app/theme/theme.dart';
 
-class CustomUi extends StatefulWidget {
-  const CustomUi({super.key});
+class NotesListUi extends StatelessWidget {
+  final String headline;
+  final String content;
+  final String date;
+  const NotesListUi({
+    super.key,
+    required this.headline,
+    required this.content,
+    required this.date,
+  });
 
-  @override
-  State<CustomUi> createState() => _CustomUiState();
-}
-
-class _CustomUiState extends State<CustomUi> {
   @override
   Widget build(BuildContext context) {
-    // final screeenWidth = MediaQuery.of(context).size.width;
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () {},
-      child: Padding(
+      child: Container(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Title',
+              headline.isEmpty ? content : headline,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontFamily: googleFontSemiBold,
@@ -34,7 +38,7 @@ class _CustomUiState extends State<CustomUi> {
             Row(
               children: [
                 Text(
-                  DateFormat.yMMMMd().format(DateTime.now()),
+                  date,
                   style: TextStyle(
                     fontFamily: googleFontFaintNormal,
                     color: faintwhiteColor,
@@ -42,9 +46,9 @@ class _CustomUiState extends State<CustomUi> {
                   ),
                 ),
                 SizedBox(width: 10.w),
-                Flexible(
+                Expanded(
                   child: Text(
-                    ' Create a Java method validateAge(int age) that: Throws an unchecked exception if age is less than 18.Catches the exception in the main method and displays "Not Eligible to Vote".',
+                    content,
                     style: TextStyle(
                       fontFamily: googleFontFaintNormal,
                       color: faintwhiteColor,
@@ -52,7 +56,6 @@ class _CustomUiState extends State<CustomUi> {
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    softWrap: true,
                   ),
                 ),
               ],

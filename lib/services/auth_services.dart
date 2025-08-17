@@ -54,7 +54,7 @@ class AuthServices {
     required String password,
   }) async {
     try {
-      var userProvider = Provider.of<UserProvideer>(context, listen: false);
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
       final navigator = Navigator.of(context);
 
       http.Response res = await http.post(
@@ -84,7 +84,7 @@ class AuthServices {
 
   Future<void> getUserData(BuildContext context) async {
     try {
-      var userProvider = Provider.of<UserProvideer>(context, listen: false);
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('x-auth-token');
 
@@ -135,7 +135,7 @@ class AuthServices {
   void signOutUser(BuildContext context) async {
     try {
       final navigator = Navigator.of(context);
-      final userProvider = Provider.of<UserProvideer>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
 
       SharedPreferences pref = await SharedPreferences.getInstance();
       await pref.setString('x-auth-token', '');

@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _tabcontroller = TabController(length: 2, vsync: this, initialIndex: 0);
   }
 
+  
+
   //signOut
   void _signOut(BuildContext context) {
     AuthServices().signOutUser(context);
@@ -28,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvideer>(context).user;
+    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
@@ -125,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: TabBarView(
           controller: _tabcontroller,
           children: [
-            ChatPage(),
+            NotesListPage(),
             Text(
               'Story',
               style: TextStyle(fontSize: 18.sp, fontFamily: googleFontNormal),
