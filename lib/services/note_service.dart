@@ -11,13 +11,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NoteService {
   Future<void> addNote({
     required BuildContext context,
+    String? noteId, // Add note ID parameter
     required String headline,
     required String content,
+    required bool isUpdate,
   }) async {
     try {
       final user = Provider.of<UserProvider>(context, listen: false).user;
       Notes notes = Notes(
-        id: '',
+        id: noteId ?? '', // Use provided note ID or empty string
         userId: user.id,
         headline: headline,
         content: content,
@@ -34,24 +36,50 @@ class NoteService {
         return;
       }
 
-      http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/notes'),
-        body: jsonEncode(notes.toJson()),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': token,
-        },
-      );
+      // Determine the endpoint based on whether it's an update or create
+      String endpoint;
+      if (isUpdate) {
+        // For updates, use the same endpoint but with PATCH method
+        endpoint = '${Constants.uri}/api/notes';
+        // Alternative: if your backend expects ID in URL path
+        // endpoint = '${Constants.uri}/api/notes/$noteId';
+      } else {
+        endpoint = '${Constants.uri}/api/notes';
+      }
+
+      print('Making ${isUpdate ? "PATCH" : "POST"} request to: $endpoint');
+      print('Note ID: $noteId');
+      print('Is Update: $isUpdate');
 
       httpErrorHandle(
-        response: res,
+        response: isUpdate
+            ? await http.patch(
+                Uri.parse(endpoint),
+                body: jsonEncode({
+                  ...notes.toJson(),
+                  'id': noteId, // Ensure ID is included in body for updates
+                }),
+                headers: <String, String>{
+                  'Content-Type': 'application/json; charset=UTF-8',
+                  'x-auth-token': token,
+                },
+              )
+            : await http.post(
+                Uri.parse(endpoint),
+                body: jsonEncode(notes.toJson()),
+                headers: <String, String>{
+                  'Content-Type': 'application/json; charset=UTF-8',
+                  'x-auth-token': token,
+                },
+              ),
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'Note Saved!');
+          showSnackBar(context, isUpdate ? 'Note Updated!' : 'Note Saved!');
         },
       );
     } catch (e) {
-      showSnackBar(context, e.toString());
+      print('Error in addNote: $e');
+      showSnackBar(context, 'Error: ${e.toString()}');
     }
   }
 
@@ -136,5 +164,39 @@ class NoteService {
       showSnackBar(context, 'Error fetching notes: ${e.toString()}');
     }
     return notes;
+  }
+
+  Future<void> deleteNote({
+    required BuildContext context,
+    required String noteId,
+  }) async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('x-auth-token');
+
+      if (token == null || token.isEmpty) {
+        showSnackBar(
+          context,
+          'Authentication token not found. Please login again.',
+        );
+        return;
+      }
+
+      httpErrorHandle(
+        response: await http.delete(
+          Uri.parse('${Constants.uri}/api/notes/$noteId'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'x-auth-token': token,
+          },
+        ),
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, 'Note Deleted!');
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
   }
 }

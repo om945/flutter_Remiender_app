@@ -1,23 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:remiender_app/pages/add_note_page.dart';
 import 'package:remiender_app/theme/theme.dart';
 
 class NotesListUi extends StatelessWidget {
   final String headline;
   final String content;
   final String date;
+  final String noteId;
   const NotesListUi({
     super.key,
     required this.headline,
     required this.content,
     required this.date,
+    required this.noteId,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(10),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => AddNotePage(
+              noteId: noteId,
+              headline: headline.toString(),
+              content: content.toString(),
+            ),
+          ),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(8.0),
         child: Column(

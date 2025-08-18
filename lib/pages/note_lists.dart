@@ -7,14 +7,14 @@ import 'package:remiender_app/services/note_service.dart';
 import 'package:remiender_app/theme/note_list_ui.dart';
 import 'package:remiender_app/theme/theme.dart';
 
-class NotesListPage extends StatefulWidget {
-  const NotesListPage({super.key});
+class NotesList extends StatefulWidget {
+  const NotesList({super.key});
 
   @override
-  State<NotesListPage> createState() => _NotesListPageState();
+  State<NotesList> createState() => _NotesListState();
 }
 
-class _NotesListPageState extends State<NotesListPage> {
+class _NotesListState extends State<NotesList> {
   bool _isLoading = false;
   final NoteService notes = NoteService();
 
@@ -81,6 +81,7 @@ class _NotesListPageState extends State<NotesListPage> {
                   content: note.content,
                   headline: note.headline,
                   date: formatTime(note.uploadTime),
+                  noteId: note.id,
                 );
               } catch (e) {
                 return const SizedBox.shrink(); // Return empty widget on error
@@ -96,7 +97,7 @@ class _NotesListPageState extends State<NotesListPage> {
               final result = await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const AddNotePage()),
               );
-              // If AddNotePage pops with `true`, it means a note was added.
+              // If AddNotePage pops with `true`, it means a note was added or updated.
               if (result == true && mounted) {
                 _loadData();
               }

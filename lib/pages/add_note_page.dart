@@ -6,7 +6,10 @@ import 'package:remiender_app/services/note_service.dart';
 import 'package:remiender_app/theme/theme.dart';
 
 class AddNotePage extends StatefulWidget {
-  const AddNotePage({super.key});
+  final String? headline;
+  final String? content;
+  final String? noteId; // Add note ID parameter
+  const AddNotePage({super.key, this.headline, this.content, this.noteId});
 
   @override
   State<AddNotePage> createState() => _AddNotePageState();
@@ -17,18 +20,31 @@ class _AddNotePageState extends State<AddNotePage> {
   final TextEditingController contentController = TextEditingController();
   final NoteService noteService = NoteService();
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with existing data if editing
+    if (widget.headline != null && widget.headline!.isNotEmpty) {
+      headlineController.text = widget.headline!;
+    }
+    if (widget.content != null && widget.content!.isNotEmpty) {
+      contentController.text = widget.content!;
+    }
+  }
+
   void addNote() async {
     await noteService.addNote(
       context: context,
+      noteId: widget.noteId, // Pass note ID for updates
       headline: headlineController.text.trim(),
       content: contentController.text.trim(),
+      isUpdate:
+          widget.noteId != null &&
+          widget.noteId!.isNotEmpty, // Check if editing
     );
 
     // Refresh the notes list
     if (mounted) {
-      // final notesProvider = Provider.of<NotesProvider>(context, listen: false);
-      // await notesProvider.fetchnotesForUser(context);
-
       // Navigate back to the notes list
       Navigator.of(context).pop(true);
     }
@@ -37,11 +53,20 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isEditing = widget.noteId != null && widget.noteId!.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          isEditing ? 'Edit Note' : 'Add Note',
+        ), // Show appropriate title
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.share)),
-          IconButton(onPressed: addNote, icon: Icon(Icons.save_alt_rounded)),
+          IconButton(
+            onPressed: addNote,
+            icon: Icon(isEditing ? Icons.update : Icons.save_alt_rounded),
+            tooltip: isEditing ? 'Update Note' : 'Save Note',
+          ),
         ],
       ),
       body: SingleChildScrollView(

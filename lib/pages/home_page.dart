@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
-import 'package:remiender_app/pages/note_lists_page.dart';
+import 'package:remiender_app/pages/note_lists.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
 
@@ -20,8 +20,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     _tabcontroller = TabController(length: 2, vsync: this, initialIndex: 0);
   }
-
-  
 
   //signOut
   void _signOut(BuildContext context) {
@@ -127,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: TabBarView(
           controller: _tabcontroller,
           children: [
-            NotesListPage(),
+            NotesList(),
             Text(
               'Story',
               style: TextStyle(fontSize: 18.sp, fontFamily: googleFontNormal),

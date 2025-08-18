@@ -34,8 +34,6 @@ async function handleGetNotes(req, res) {
   try {
     const userId = req.user;
     const notes = await Note.find({ userId });
-    // notes will be an array, even if empty, so we don't need to check if it's falsy
-    // console.log('Notes found:', notes);
     res.json(notes);
   } catch (e) {
     console.error('Error in handleGetNotes:', e);
@@ -43,4 +41,66 @@ async function handleGetNotes(req, res) {
   }
 }
 
-export { handleGenerateNewNote, handleGetNotes };
+async function handleEditNotes(req, res) {
+  const userId = req.user; // Fix: was req.User (capital U)
+  const { id, headline, content } = req.body; // Add id to destructuring
+
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'No user found',
+    });
+  }
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Note ID is required',
+    });
+  }
+
+  try {
+    const notes = await Note.findOneAndUpdate(
+      {
+        _id: id, // Use the note ID to find specific note
+        userId: userId, // Also ensure it belongs to the user
+      },
+      {
+        headline,
+        content,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!notes) {
+      return res.status(404).json({
+        success: false,
+        message: 'Note not found or you do not have permission to edit it',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Note edited successfully',
+      note: {
+        headline: notes.headline,
+        content: notes.content,
+        userId: notes.userId,
+        _id: notes._id,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+      },
+    });
+  } catch (e) {
+    console.error('Error editing note:', e);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while editing note',
+    });
+  }
+}
+
+export { handleGenerateNewNote, handleGetNotes, handleEditNotes };
