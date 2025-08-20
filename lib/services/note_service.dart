@@ -41,16 +41,9 @@ class NoteService {
       if (isUpdate) {
         // For updates, use the same endpoint but with PATCH method
         endpoint = '${Constants.uri}/api/notes';
-        // Alternative: if your backend expects ID in URL path
-        // endpoint = '${Constants.uri}/api/notes/$noteId';
       } else {
         endpoint = '${Constants.uri}/api/notes';
       }
-
-      print('Making ${isUpdate ? "PATCH" : "POST"} request to: $endpoint');
-      print('Note ID: $noteId');
-      print('Is Update: $isUpdate');
-
       httpErrorHandle(
         response: isUpdate
             ? await http.patch(
@@ -78,7 +71,6 @@ class NoteService {
         },
       );
     } catch (e) {
-      print('Error in addNote: $e');
       showSnackBar(context, 'Error: ${e.toString()}');
     }
   }
@@ -184,11 +176,14 @@ class NoteService {
 
       httpErrorHandle(
         response: await http.delete(
-          Uri.parse('${Constants.uri}/api/notes/$noteId'),
+          Uri.parse('${Constants.uri}/api/notes'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'x-auth-token': token,
           },
+          body: jsonEncode({
+            'id': noteId,
+          }),
         ),
         context: context,
         onSuccess: () {

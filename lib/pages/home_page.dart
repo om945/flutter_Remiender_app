@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
 import 'package:remiender_app/pages/note_lists.dart';
+import 'package:remiender_app/pages/todo_list.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
 
@@ -124,13 +125,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         padding: const EdgeInsets.all(10.0),
         child: TabBarView(
           controller: _tabcontroller,
-          children: [
-            NotesList(),
-            Text(
-              'Story',
-              style: TextStyle(fontSize: 18.sp, fontFamily: googleFontNormal),
-            ),
-          ],
+          children: [NotesList(), TodoList()],
         ),
       ),
     );

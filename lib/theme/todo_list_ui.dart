@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:remiender_app/theme/theme.dart';
 
-class NotesListUi extends StatelessWidget {
-  final String headline;
+class TodoListUi extends StatelessWidget {
   final String content;
   final String date;
   final String noteId;
@@ -11,10 +10,8 @@ class NotesListUi extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
-
-  const NotesListUi({
+  const TodoListUi({
     super.key,
-    required this.headline,
     required this.content,
     required this.date,
     required this.noteId,
@@ -56,7 +53,7 @@ class NotesListUi extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    headline.isEmpty ? content : headline,
+                    content,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -74,19 +71,6 @@ class NotesListUi extends StatelessWidget {
                           fontFamily: googleFontFaintNormal,
                           color: faintwhiteColor,
                           fontSize: 14.sp,
-                        ),
-                      ),
-                      SizedBox(width: 10.w),
-                      Expanded(
-                        child: Text(
-                          content,
-                          style: TextStyle(
-                            fontFamily: googleFontFaintNormal,
-                            color: faintwhiteColor,
-                            fontSize: 15.sp,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

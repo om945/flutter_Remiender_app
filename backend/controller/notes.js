@@ -42,8 +42,8 @@ async function handleGetNotes(req, res) {
 }
 
 async function handleEditNotes(req, res) {
-  const userId = req.user; // Fix: was req.User (capital U)
-  const { id, headline, content } = req.body; // Add id to destructuring
+  const userId = req.user;
+  const { id, headline, content } = req.body;
 
   if (!userId) {
     return res.status(400).json({
@@ -103,4 +103,48 @@ async function handleEditNotes(req, res) {
   }
 }
 
-export { handleGenerateNewNote, handleGetNotes, handleEditNotes };
+async function handleDeleteNote(req, res) {
+  const userId = req.user;
+  const { id } = req.body;
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'user not found',
+    });
+  }
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Note ID is not found',
+    });
+  }
+
+  try {
+    const deletnote = await Note.findOneAndDelete({
+      _id: id,
+      userId: userId,
+    });
+    if (!deletnote) {
+      return res.status(404).json({
+        success: false,
+        message: 'falid to delete note',
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Note is deleted',
+    });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while deleting note',
+    });
+  }
+}
+
+export {
+  handleGenerateNewNote,
+  handleGetNotes,
+  handleEditNotes,
+  handleDeleteNote,
+};

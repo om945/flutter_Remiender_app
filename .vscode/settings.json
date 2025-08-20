@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "D:/Projects/remiender_app/windows"
+    "cmake.sourceDirectory": "D:/Projects/remiender_app/windows",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
