@@ -1,49 +1,42 @@
-import Note from '../models/notes.js';
-import User from '../models/user.js';
+import Todo from '../models/todo';
+import User from '../models/user';
 
-async function handleGenerateNewNote(req, res) {
-  const { headline, content } = req.body;
+async function handleGenerateNewTodos(req, res) {
+  const { content } = req.body;
   try {
     const userId = req.user;
-    // console.log(req.user);
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
     if (!content || content.trim().length === 0) {
       return res.status(400).json({ error: 'Content is required' });
     }
-
-    let note = new Note({
-      headline: headline || '',
+    let todo = new Todo({
       content: content.trim(),
       userId: user._id,
     });
-
-    note = await note.save();
-    res.status(201).json(note);
+    todo = await todo.save();
+    res.status(201).json(todo);
   } catch (e) {
-    // console.error('Error creating note:', e);
     res.status(500).json({ error: e.message });
   }
 }
 
-async function handleGetNotes(req, res) {
+async function handleGetTodos(req, res) {
   try {
     const userId = req.user;
-    const notes = await Note.find({ userId });
-    res.json(notes);
+    const todo = await Todo.find({ userId });
+    res.json(todo);
   } catch (e) {
-    console.error('Error in handleGetNotes:', e);
     res.status(500).json({ error: e.message });
   }
 }
 
-async function handleEditNotes(req, res) {
+async function handleEditTodos(req, res) {
   const userId = req.user;
-  const { id, headline, content } = req.body;
+  const { id, content } = req.body;
 
   if (!userId) {
     return res.status(400).json({
@@ -55,18 +48,17 @@ async function handleEditNotes(req, res) {
   if (!id) {
     return res.status(400).json({
       success: false,
-      message: 'Note ID is required',
+      message: 'Todo ID is required',
     });
   }
 
   try {
-    const notes = await Note.findOneAndUpdate(
+    const todo = await Todo.findOneAndUpdate(
       {
-        _id: id, // Use the note ID to find specific note
-        userId: userId, // Also ensure it belongs to the user
+        _id: id,
+        userId: userId,
       },
       {
-        headline,
         content,
       },
       {
@@ -74,57 +66,52 @@ async function handleEditNotes(req, res) {
         runValidators: true,
       }
     );
-
-    if (!notes) {
+    if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Note not found or you do not have permission to edit it',
+        message: 'Todo not found or you do not have permition to edit it',
       });
     }
-
     return res.status(200).json({
       success: true,
-      message: 'Note edited successfully',
-      note: {
-        headline: notes.headline,
-        content: notes.content,
-        userId: notes.userId,
-        _id: notes._id,
-        createdAt: notes.createdAt,
-        updatedAt: notes.updatedAt,
+      message: 'Todo edited successfully',
+      todo: {
+        content: todo.content,
+        userId: todo.userId,
+        _id: todo._id,
+        createdAt: todo.createdAt,
+        updatedAt: todo.updatedAt,
       },
     });
   } catch (e) {
-    console.error('Error editing note:', e);
     return res.status(500).json({
       success: false,
-      message: 'Something went wrong while editing note',
+      message: 'Something went wrong while editing Todo',
     });
   }
 }
 
-async function handleDeleteNote(req, res) {
+async function handleDeletetodos(req, res) {
   const userId = req.user;
   const { id } = req.body;
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: 'user not found',
+      message: 'User not found',
     });
   }
   if (!id) {
     return res.status(400).json({
       success: false,
-      message: 'Note ID is not found',
+      message: 'Todo ID is not found',
     });
   }
-
   try {
-    const deletnote = await Note.findOneAndDelete({
+    const deletetodo = await Todo.findOneAndDelete({
       _id: id,
       userId: userId,
     });
-    if (!deletnote) {
+    if (!deletetodo) {
       return res.status(404).json({
         success: false,
         message: 'faild to delete note',
@@ -132,7 +119,7 @@ async function handleDeleteNote(req, res) {
     }
     return res.status(200).json({
       success: true,
-      message: 'Note is deleted',
+      message: 'Todo is deleted',
     });
   } catch (e) {
     return res.status(500).json({
@@ -143,8 +130,8 @@ async function handleDeleteNote(req, res) {
 }
 
 export {
-  handleGenerateNewNote,
-  handleGetNotes,
-  handleEditNotes,
-  handleDeleteNote,
+  handleEditTodos,
+  handleGenerateNewTodos,
+  handleGetTodos,
+  handleDeletetodos,
 };
