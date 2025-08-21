@@ -1,5 +1,5 @@
-import Todo from '../models/todo';
-import User from '../models/user';
+import Todo from '../models/todo.js';
+import User from '../models/user.js';
 
 async function handleGenerateNewTodos(req, res) {
   const { content } = req.body;

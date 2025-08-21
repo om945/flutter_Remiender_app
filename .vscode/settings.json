@@ -1,4 +1,5 @@
 {
-    "cmake.sourceDirectory": "D:/Projects/remiender_app/windows",
-    "java.configuration.updateBuildConfiguration": "interactive"
+  "cmake.sourceDirectory": "D:/Projects/remiender_app/windows",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "C_Cpp.errorSquiggles": "disabled"
 }

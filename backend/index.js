@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import authRouter from './router/auth.js';
 import notesRouter from './router/notes.js';
+import todoRouter from './router/todos.js';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -9,6 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(authRouter);
 app.use(notesRouter);
+app.use(todoRouter);
 
 const DB =
   'mongodb+srv://ombelekar21:IeIUBVCUzyWRtKPl@cluster0.cpoc2p2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
