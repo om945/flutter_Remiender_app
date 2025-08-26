@@ -4,6 +4,7 @@ import {
   handleEditTodos,
   handleGenerateNewTodos,
   handleGetTodos,
+  handleUpdateTodoCompletionStatus,
 } from '../controller/todo.js';
 import auth from '../middleware/auth.js';
 
@@ -13,5 +14,6 @@ router.post('/api/todo', auth, handleGenerateNewTodos);
 router.get('/api/todo', auth, handleGetTodos);
 router.patch('/api/todo', auth, handleEditTodos);
 router.delete('/api/todo', auth, handleDeletetodos);
+router.patch('/api/todo/:id/complete', auth, handleUpdateTodoCompletionStatus);
 
 export default router;

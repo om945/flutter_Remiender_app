@@ -18,6 +18,14 @@ const todoSchema = mongoose.Schema(
         message: 'Add todo to save',
       },
     },
+    reminderDate: {
+      type: Date,
+      required: false,
+    },
+    isCompleted: {
+      type: Boolean,
+      default: false,
+    },
     dateTimeToComplete: {
       required: false,
       type: String,

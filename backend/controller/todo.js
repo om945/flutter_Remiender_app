@@ -2,7 +2,7 @@ import Todo from '../models/todo.js';
 import User from '../models/user.js';
 
 async function handleGenerateNewTodos(req, res) {
-  const { content } = req.body;
+  const { content, reminderDate, isCompleted } = req.body;
   try {
     const userId = req.user;
     const user = await User.findById(userId);
@@ -16,6 +16,8 @@ async function handleGenerateNewTodos(req, res) {
     let todo = new Todo({
       content: content.trim(),
       userId: user._id,
+      reminderDate: reminderDate,
+      isCompleted: isCompleted,
     });
     todo = await todo.save();
     res.status(201).json(todo);
@@ -36,7 +38,7 @@ async function handleGetTodos(req, res) {
 
 async function handleEditTodos(req, res) {
   const userId = req.user;
-  const { id, content } = req.body;
+  const { id, content, reminderDate } = req.body;
 
   if (!userId) {
     return res.status(400).json({
@@ -60,6 +62,7 @@ async function handleEditTodos(req, res) {
       },
       {
         content,
+        reminderDate,
       },
       {
         new: true,
@@ -81,6 +84,8 @@ async function handleEditTodos(req, res) {
         _id: todo._id,
         createdAt: todo.createdAt,
         updatedAt: todo.updatedAt,
+        reminderDate: todo.reminderDate,
+        isCompleted: todo.isCompleted,
       },
     });
   } catch (e) {
@@ -129,9 +134,72 @@ async function handleDeletetodos(req, res) {
   }
 }
 
+async function handleUpdateTodoCompletionStatus(req, res) {
+  const userId = req.user;
+  const { id } = req.params; // Get todo ID from parameters
+  const { isCompleted } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'No user found',
+    });
+  }
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Todo ID is required',
+    });
+  }
+
+  try {
+    const todo = await Todo.findOneAndUpdate(
+      {
+        _id: id,
+        userId: userId,
+      },
+      {
+        isCompleted,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!todo) {
+      return res.status(404).json({
+        success: false,
+        message: 'Todo not found or you do not have permission to edit it',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Todo completion status updated successfully',
+      todo: {
+        content: todo.content,
+        userId: todo.userId,
+        _id: todo._id,
+        createdAt: todo.createdAt,
+        updatedAt: todo.updatedAt,
+        reminderDate: todo.reminderDate,
+        isCompleted: todo.isCompleted,
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while updating Todo completion status',
+      error: e.message,
+    });
+  }
+}
+
 export {
   handleEditTodos,
   handleGenerateNewTodos,
   handleGetTodos,
   handleDeletetodos,
+  handleUpdateTodoCompletionStatus,
 };

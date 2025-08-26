@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import authRouter from './router/auth.js';
 import notesRouter from './router/notes.js';
 import todoRouter from './router/todos.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -12,11 +14,8 @@ app.use(authRouter);
 app.use(notesRouter);
 app.use(todoRouter);
 
-const DB =
-  'mongodb+srv://ombelekar21:IeIUBVCUzyWRtKPl@cluster0.cpoc2p2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
 mongoose
-  .connect(DB)
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('mongoose connected');
   })
@@ -25,5 +24,5 @@ mongoose
   });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`server started app port ${PORT}`);
+  console.log(`server started at port ${PORT}`);
 });

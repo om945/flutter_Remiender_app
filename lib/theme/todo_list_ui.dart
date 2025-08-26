@@ -5,20 +5,24 @@ import 'package:remiender_app/theme/theme.dart';
 class TodoListUi extends StatelessWidget {
   final String content;
   final String date;
-  final String noteId;
+  final String todoId;
   final bool isSelectionMode;
   final bool isSelected;
+  final bool isCompleted;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final ValueChanged<bool?> onCompletionChanged;
   const TodoListUi({
     super.key,
     required this.content,
     required this.date,
-    required this.noteId,
+    required this.todoId,
     required this.isSelectionMode,
     required this.isSelected,
+    required this.isCompleted,
     required this.onTap,
     required this.onLongPress,
+    required this.onCompletionChanged,
   });
 
   @override
@@ -36,6 +40,15 @@ class TodoListUi extends StatelessWidget {
         ),
         child: Row(
           children: [
+            !isSelectionMode
+                ? Checkbox(
+                    value: isCompleted,
+                    onChanged: onCompletionChanged,
+                    activeColor: blueColor,
+                    checkColor: blackColor,
+                    side: const BorderSide(color: whiteColor),
+                  )
+                : SizedBox(),
             if (isSelectionMode)
               Padding(
                 padding: EdgeInsets.only(right: 8.w),

@@ -88,70 +88,30 @@ class NoteService {
           'x-auth-token': token,
         },
       );
-      // final Map<String, dynamic> responseBody = jsonDecode(res.body);
-      //   if (responseBody['success'] == true && responseBody['notes'] is List) {
-      //     final List<dynamic> responseData = responseBody['notes'];
-      //     for (var i = 0; i < responseData.length; i++) {
-      //       notes.add(Notes.fromJson(responseData[i]));
-      //     }
-      //   } else {
-      //     showSnackBar(
-      //       context,
-      //       responseBody['message'] ?? 'Faild to fetch notes',
-      //     );
 
-      if (res.statusCode == 200) {
-        final dynamic responseBody = jsonDecode(res.body);
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          // The backend returns a direct JSON array of notes.
+          final List<dynamic> responseData = jsonDecode(res.body);
 
-        // Handle different possible response structures
-        List<dynamic> notesData = [];
-
-        if (responseBody is List) {
-          // Backend returns notes directly as an array
-          notesData = responseBody;
-        } else if (responseBody is Map<String, dynamic>) {
-          // Handle wrapped responses if they exist
-          if (responseBody['notes'] is List) {
-            notesData = responseBody['notes'];
-          } else if (responseBody['data'] is List) {
-            notesData = responseBody['data'];
-          } else {
-            showSnackBar(
-              context,
-              responseBody['message'] ?? 'Invalid response format',
-            );
-            return notes;
-          }
-        } else {
-          showSnackBar(context, 'Unexpected response format');
-          return notes;
-        }
-
-        // Parse each note
-        for (var noteData in notesData) {
-          try {
-            if (noteData is Map<String, dynamic>) {
-              notes.add(Notes.fromJson(noteData));
-            }
-          } catch (parseError) {
-            showSnackBar(context, parseError.toString());
-            // Continue with other notes instead of failing completely
-          }
-        }
-      } else {
-        try {
-          final errorBody = jsonDecode(res.body);
-          showSnackBar(
-            context,
-            'Failed to fetch notes: ${errorBody['error'] ?? errorBody['message'] ?? 'HTTP ${res.statusCode}'}',
+          // Use a more functional approach to parse the notes.
+          // This is robust against malformed items in the list.
+          notes.addAll(
+            responseData.whereType<Map<String, dynamic>>().map((noteData) {
+              try {
+                return Notes.fromJson(noteData);
+              } catch (e) {
+                // Log or silently ignore individual parsing errors
+                // to prevent one bad note from stopping the whole process.
+                debugPrint('Could not parse note: $e');
+                return null;
+              }
+            }).whereType<Notes>(), // Filter out any nulls from failed parses
           );
-        } catch (parseError) {
-          showSnackBar(
-            context,
-            'Failed to fetch notes: HTTP ${res.statusCode}',
-          );
-        }
-      }
+        },
+      );
     } catch (e) {
       showSnackBar(context, 'Error fetching notes: ${e.toString()}');
     }

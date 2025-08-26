@@ -2,9 +2,9 @@ import jwt from 'jsonwebtoken';
 
 const auth = async (req, res, next) => {
   try {
-    // const token = req.header('x-auth-token');
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = req.header('x-auth-token');
+    // const authHeader = req.headers['authorization'];
+    // const token = authHeader && authHeader.split(' ')[1];
     if (!token)
       return res.status(401).json({ msg: 'No auth token, access denied' });
 
