@@ -64,6 +64,9 @@ class AuthServices {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+      if (email.isEmpty || password.isEmpty) {
+        return showSnackBar(context, 'All fields are required');
+      }
       httpErrorHandle(
         response: res,
         context: context,

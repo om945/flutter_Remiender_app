@@ -100,7 +100,7 @@ class _TodoListState extends State<TodoList> {
 
   bool _isLoading = false;
 
-  void addTodo() async {
+  void addTodo({String? todoId}) async {
     DateTime? reminderDateTime;
     if (_selectedDate != null && _selectedTime != null) {
       reminderDateTime = DateTime(
@@ -115,17 +115,12 @@ class _TodoListState extends State<TodoList> {
     await todoService.addTodo(
       context: context,
       content: toDoController.text.trim(),
-      isUpdate: widget.todoId != null && widget.todoId!.isNotEmpty,
-      todoId: widget.todoId,
+      isUpdate: todoId != null && todoId.isNotEmpty,
+      todoId: todoId,
       reminderDate: reminderDateTime,
     );
     if (!mounted) return;
     Navigator.pop(context); // Close the modal after saving
-    toDoController.clear();
-    setState(() {
-      _selectedDate = null;
-      _selectedTime = null;
-    });
   }
 
   // ignore: unused_element
@@ -168,10 +163,7 @@ class _TodoListState extends State<TodoList> {
         }
       });
     } else {
-      todoField();
-      if (mounted) {
-        _loadData();
-      }
+      todoField(content: todo.content, todoId: todo.id);
     }
   }
 
@@ -219,7 +211,8 @@ class _TodoListState extends State<TodoList> {
     }
   }
 
-  void todoField() {
+  void todoField({String? content, String? todoId}) {
+    toDoController.text = content ?? '';
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -267,7 +260,7 @@ class _TodoListState extends State<TodoList> {
                     ),
                     TextButton(
                       onPressed: () {
-                        addTodo();
+                        addTodo(todoId: todoId);
                       },
                       child: Text(
                         'Save',
@@ -344,7 +337,14 @@ class _TodoListState extends State<TodoList> {
           ),
         );
       },
-    );
+    ).whenComplete(() {
+      toDoController.clear();
+      setState(() {
+        _selectedDate = null;
+        _selectedTime = null;
+      });
+      _loadData();
+    });
   }
 
   @override
@@ -396,9 +396,6 @@ class _TodoListState extends State<TodoList> {
               : FloatingActionButton(
                   onPressed: () async {
                     todoField();
-                    if (mounted) {
-                      _loadData();
-                    }
                   },
                   backgroundColor: blueColor,
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),

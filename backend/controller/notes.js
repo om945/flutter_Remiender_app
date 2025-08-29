@@ -2,7 +2,7 @@ import Note from '../models/notes.js';
 import User from '../models/user.js';
 
 async function handleGenerateNewNote(req, res) {
-  const { headline, content } = req.body;
+  const { headline, content, isFavorite } = req.body;
   try {
     const userId = req.user;
     // console.log(req.user);
@@ -20,6 +20,7 @@ async function handleGenerateNewNote(req, res) {
       headline: headline || '',
       content: content.trim(),
       userId: user._id,
+      isFavorite: isFavorite,
     });
 
     note = await note.save();
@@ -92,6 +93,7 @@ async function handleEditNotes(req, res) {
         _id: notes._id,
         createdAt: notes.createdAt,
         updatedAt: notes.updatedAt,
+        isFavorite: notes.isFavorite,
       },
     });
   } catch (e) {
@@ -142,9 +144,71 @@ async function handleDeleteNote(req, res) {
   }
 }
 
+async function handleUpdateFavorite(req, res) {
+  const userId = req.user;
+  const { id } = req.params;
+  const { isFavorite } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'No user found',
+    });
+  }
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Note ID is required',
+    });
+  }
+
+  try {
+    const note = await note.findOneAndUpdate(
+      {
+        _id: id,
+        userId: userId,
+      },
+      {
+        isFavorite,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!note) {
+      return res.status(404).json({
+        success: false,
+        message: 'Note not found or you do not have permission to edit it',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Note completion status updated successfully',
+      todo: {
+        content: note.content,
+        headline: note.headline,
+        _id: note._id,
+        createdAt: note.createdAt,
+        updatedAt: note.updatedAt,
+        isFavorite: note.isFavorite,
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while updating favorite note',
+      error: e.message,
+    });
+  }
+}
+
 export {
   handleGenerateNewNote,
   handleGetNotes,
   handleEditNotes,
   handleDeleteNote,
+  handleUpdateFavorite
 };

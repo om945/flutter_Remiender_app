@@ -64,8 +64,8 @@ class _SignupPageState extends State<SignupPage> {
             children: [
               Container(
                 width: screeenWidth,
-                height: screeenHeight * 0.45,
-                decoration: BoxDecoration(color: blueColor),
+                height: screeenHeight * 0.50,
+                decoration: BoxDecoration(gradient: Grediants.gradient1),
               ),
               _isSignupView
                   ? Positioned(

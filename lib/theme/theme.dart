@@ -22,3 +22,11 @@ const Color blackColor = Color.fromRGBO(30, 30, 30, 1);
 const Color bgColor = Color.fromRGBO(52, 53, 58, 1);
 const Color whiteColor = Color.fromRGBO(217, 217, 217, 1);
 const Color faintwhiteColor = Color.fromARGB(255, 155, 155, 155);
+
+class Grediants {
+  static const Gradient gradient1 = LinearGradient(
+    colors: [blueColor, bgColor],
+    begin: Alignment(0, 0),
+    end: Alignment.bottomCenter,
+  );
+}

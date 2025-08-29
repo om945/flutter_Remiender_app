@@ -20,8 +20,12 @@ const notesSchema = mongoose.Schema(
         validator: (value) => {
           return value && value.trim().length > 0;
         },
-        message: 'Add note to save',
+        message: 'please add note to save',
       },
+    },
+    isFavorite: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

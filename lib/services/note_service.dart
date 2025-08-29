@@ -118,6 +118,44 @@ class NoteService {
     return notes;
   }
 
+  Future<void> updateFavoriteNote({
+    required BuildContext context,
+    required String noteId,
+    required bool isFavorite,
+  }) async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final token = userProvider.user.token;
+
+      if (token.isEmpty) {
+        showSnackBar(
+          context,
+          'Authentication token not found. Please login again.',
+        );
+        return;
+      }
+
+      http.Response res = await http.patch(
+        Uri.parse('${Constants.uri}/api/todo/$noteId/favorite'),
+        body: jsonEncode({'isFavorite': isFavorite}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, 'Note status updated successfully!');
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
   Future<void> deleteNote({
     required BuildContext context,
     required String noteId,
@@ -141,9 +179,7 @@ class NoteService {
             'Content-Type': 'application/json; charset=UTF-8',
             'x-auth-token': token,
           },
-          body: jsonEncode({
-            'id': noteId,
-          }),
+          body: jsonEncode({'id': noteId}),
         ),
         context: context,
         onSuccess: () {

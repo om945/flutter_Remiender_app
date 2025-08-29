@@ -6,6 +6,7 @@ class Notes {
   final String headline;
   final String content;
   final DateTime? uploadTime;
+  final bool? isFavorite;
 
   Notes({
     required this.id,
@@ -13,6 +14,7 @@ class Notes {
     required this.headline,
     required this.content,
     this.uploadTime,
+    this.isFavorite,
   });
 
   factory Notes.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Notes {
           : json['uploadedAt'] != null
           ? DateTime.tryParse(json['uploadedAt'].toString())
           : null,
+      isFavorite: json['isFavorite'] ?? false,
     );
   }
 
@@ -36,6 +39,25 @@ class Notes {
       'headline': headline,
       'content': content,
       'uploadTime': uploadTime?.toIso8601String(),
+      'isFavorite': isFavorite,
     };
+  }
+
+  Notes copyWith({
+    String? id,
+    String? userId,
+    String? headline,
+    String? content,
+    DateTime? uploadTime,
+    bool? isFavorite,
+  }) {
+    return Notes(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      headline: headline ?? this.headline,
+      content: content ?? this.content,
+      uploadTime: uploadTime ?? this.uploadTime,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
   }
 }

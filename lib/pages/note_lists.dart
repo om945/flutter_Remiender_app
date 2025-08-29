@@ -119,11 +119,23 @@ class _NotesListState extends State<NotesList> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: blueColor,
+                  fontFamily: googleFontNormal,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
+              child: Text(
+                'Delete',
+                style: TextStyle(
+                  color: blueColor,
+                  fontFamily: googleFontNormal,
+                ),
+              ),
             ),
           ],
         );

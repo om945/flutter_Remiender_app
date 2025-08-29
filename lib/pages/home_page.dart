@@ -27,6 +27,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     AuthServices().signOutUser(context);
   }
 
+  void showPopDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext contxt) {
+        return AlertDialog(
+          title: Text(
+            'Sign out',
+            style: TextStyle(fontFamily: googleFontBold, color: whiteColor),
+          ),
+          content: Text(
+            'Are you sure! you want to sign out',
+            style: TextStyle(
+              fontFamily: googleFontNormal,
+              color: faintwhiteColor,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Cancle',
+                style: TextStyle(
+                  color: blueColor,
+                  fontFamily: googleFontNormal,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => _signOut(context),
+              child: Text(
+                'Delete',
+                style: TextStyle(
+                  color: blueColor,
+                  fontFamily: googleFontNormal,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context).user;
@@ -84,10 +129,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.search_rounded)),
-          IconButton(
-            onPressed: () => _signOut(context),
-            icon: const Icon(Icons.logout),
-          ),
+          IconButton(onPressed: showPopDialog, icon: const Icon(Icons.logout)),
           PopupMenuButton<String>(
             onSelected: (value) {
               // ignore: avoid_print
