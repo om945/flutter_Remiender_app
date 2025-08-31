@@ -14,6 +14,6 @@ router.post('/api/notes', auth, handleGenerateNewNote);
 router.get('/api/notes', auth, handleGetNotes);
 router.patch('/api/notes', auth, handleEditNotes);
 router.delete('/api/notes', auth, handleDeleteNote);
-router.patch('/api/todo/:id/favorite', auth, handleUpdateFavorite);
+router.patch('/api/notes/:id/favorite', auth, handleUpdateFavorite);
 
 export default router;

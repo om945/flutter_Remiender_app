@@ -136,7 +136,7 @@ class NoteService {
       }
 
       http.Response res = await http.patch(
-        Uri.parse('${Constants.uri}/api/todo/$noteId/favorite'),
+        Uri.parse('${Constants.uri}/api/notes/$noteId/favorite'),
         body: jsonEncode({'isFavorite': isFavorite}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',

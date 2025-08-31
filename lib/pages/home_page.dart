@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
+import 'package:remiender_app/pages/favorite_page.dart';
 import 'package:remiender_app/pages/note_lists.dart';
 import 'package:remiender_app/pages/todo_list.dart';
 import 'package:remiender_app/services/auth_services.dart';
@@ -131,10 +132,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           IconButton(onPressed: () {}, icon: const Icon(Icons.search_rounded)),
           IconButton(onPressed: showPopDialog, icon: const Icon(Icons.logout)),
           PopupMenuButton<String>(
-            onSelected: (value) {
-              // ignore: avoid_print
-              print(value);
-            },
             color: bgColor,
             itemBuilder: (BuildContext context) {
               return [
@@ -149,6 +146,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 PopupMenuItem(
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: (_) => FavoritePage()));
+                  },
                   value: 'Star Message',
                   child: Text(
                     'Star Message',

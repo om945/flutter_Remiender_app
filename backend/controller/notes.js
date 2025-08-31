@@ -164,7 +164,7 @@ async function handleUpdateFavorite(req, res) {
   }
 
   try {
-    const note = await note.findOneAndUpdate(
+    const note = await Note.findOneAndUpdate(
       {
         _id: id,
         userId: userId,
@@ -210,5 +210,5 @@ export {
   handleGetNotes,
   handleEditNotes,
   handleDeleteNote,
-  handleUpdateFavorite
+  handleUpdateFavorite,
 };

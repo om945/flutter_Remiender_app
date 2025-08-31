@@ -59,6 +59,7 @@ class _AddNotePageState extends State<AddNotePage> {
       appBar: AppBar(
         title: Text(
           isEditing ? 'Edit Note' : 'Add Note',
+          style: TextStyle(fontFamily: googleFontNormal, color: whiteColor),
         ), // Show appropriate title
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.share)),

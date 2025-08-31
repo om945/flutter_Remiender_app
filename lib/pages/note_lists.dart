@@ -103,6 +103,30 @@ class _NotesListState extends State<NotesList> {
     });
   }
 
+  Future<void> _favoriteNotes() async {
+    final notesProvider = Provider.of<NotesProvider>(context, listen: false);
+    bool isCurrentlyFavorite = false;
+
+    if (_selectedNoteIds.isNotEmpty) {
+      final firstSelectedNoteId = _selectedNoteIds.first;
+      final firstSelectedNote = notesProvider.notes.firstWhere(
+        (note) => note.id == firstSelectedNoteId,
+      );
+      isCurrentlyFavorite = firstSelectedNote.isFavorite ?? false;
+    }
+
+    for (String noteId in _selectedNoteIds) {
+      await noteService.updateFavoriteNote(
+        context: context,
+        noteId: noteId,
+        isFavorite: !isCurrentlyFavorite,
+      );
+    }
+    // Optionally refresh data and exit selection mode
+    _cancelSelectionMode();
+    await _loadData();
+  }
+
   Future<void> _deleteSelectedNotes() async {
     final bool? confirm = await showDialog<bool>(
       context: context,
@@ -197,25 +221,49 @@ class _NotesListState extends State<NotesList> {
 
         return Scaffold(
           floatingActionButton: _isSelectionMode
-              ? Row(
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FloatingActionButton(
-                      heroTag: 'cancel_button',
-                      onPressed: _cancelSelectionMode,
-                      backgroundColor: blueColor,
-                      child: const Icon(Icons.close, color: blackColor),
-                    ),
-                    SizedBox(width: 10.w),
-                    FloatingActionButton(
-                      heroTag: 'delete_button',
+                      heroTag: 'favorite_button',
                       onPressed: _selectedNoteIds.isNotEmpty
-                          ? _deleteSelectedNotes
+                          ? _favoriteNotes
                           : null,
-                      backgroundColor: _selectedNoteIds.isNotEmpty
-                          ? Colors.red
-                          : Colors.grey,
-                      child: const Icon(Icons.delete, color: whiteColor),
+                      backgroundColor: blueColor,
+                      child:
+                          (_selectedNoteIds.isNotEmpty &&
+                              notes
+                                      .firstWhere(
+                                        (n) => n.id == _selectedNoteIds.first,
+                                      )
+                                      .isFavorite ==
+                                  true)
+                          ? const Icon(Icons.star)
+                          : const Icon(Icons.star_border),
+                    ),
+                    SizedBox(height: 10.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FloatingActionButton(
+                          heroTag: 'cancel_button',
+                          onPressed: _cancelSelectionMode,
+                          backgroundColor: blueColor,
+                          child: const Icon(Icons.close, color: blackColor),
+                        ),
+                        SizedBox(width: 10.w),
+                        FloatingActionButton(
+                          heroTag: 'delete_button',
+                          onPressed: _selectedNoteIds.isNotEmpty
+                              ? _deleteSelectedNotes
+                              : null,
+                          backgroundColor: _selectedNoteIds.isNotEmpty
+                              ? Colors.red
+                              : Colors.grey,
+                          child: const Icon(Icons.delete, color: whiteColor),
+                        ),
+                      ],
                     ),
                   ],
                 )
