@@ -47,6 +47,7 @@ class TodoListUi extends StatelessWidget {
                     activeColor: blueColor,
                     checkColor: blackColor,
                     side: const BorderSide(color: whiteColor),
+                    shape: const CircleBorder(),
                   )
                 : SizedBox(),
             if (isSelectionMode)

@@ -8,9 +8,15 @@ import 'package:remiender_app/theme/theme.dart';
 import 'package:remiender_app/theme/todo_list_ui.dart';
 
 class TodoList extends StatefulWidget {
+  final String searchQuery;
   final String? content;
   final String? todoId;
-  const TodoList({super.key, this.content, this.todoId});
+  const TodoList({
+    super.key,
+    this.content,
+    this.todoId,
+    required this.searchQuery,
+  });
 
   @override
   State<TodoList> createState() => _TodoListState();
@@ -33,7 +39,15 @@ class _TodoListState extends State<TodoList> {
     if (widget.content != null) {
       toDoController.text = widget.content!;
     }
-    _loadData(); // Call _loadData here
+    _loadData();
+  }
+
+  @override
+  void didUpdateWidget(covariant TodoList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchQuery != widget.searchQuery) {
+      setState(() {});
+    }
   }
 
   Future<void> _pickDate(BuildContext context) async {
@@ -353,6 +367,17 @@ class _TodoListState extends State<TodoList> {
       builder: (context, todoProvider, child) {
         final todos = todoProvider.todos;
 
+        final filterTodos = todos.where((todo) {
+          final query = widget.searchQuery.toLowerCase();
+          return todo.content.toLowerCase().contains(query);
+        }).toList();
+
+        final incompleteTodos = filterTodos
+            .where((todo) => todo.isCompleted == false)
+            .toList();
+        final completedTodos = filterTodos
+            .where((todo) => todo.isCompleted == true)
+            .toList();
         String formatTime(DateTime? dateTime) {
           if (dateTime == null) return 'No date';
           try {
@@ -400,7 +425,7 @@ class _TodoListState extends State<TodoList> {
                   backgroundColor: blueColor,
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),
                 ),
-          body: todos.isEmpty
+          body: todoProvider.todos.isEmpty
               ? RefreshIndicator(
                   onRefresh: _loadData,
                   child: ListView(
@@ -420,107 +445,75 @@ class _TodoListState extends State<TodoList> {
                 )
               : RefreshIndicator(
                   onRefresh: _loadData,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ElevatedButton(
-                      //   onPressed: () {
-                      //     TodoService().showImmediateNotification(
-                      //       'Test Title',
-                      //       'This is an immediate test notification!',
-                      //     );
-                      //   },
-                      //   child: const Text('Show Immediate Notification'),
-                      // ),
-                      todos
-                              .where((todo) => todo.isCompleted == false)
-                              .isNotEmpty
-                          ? Expanded(
-                              child: ListView.builder(
-                                itemCount: todos
-                                    .where((todo) => todo.isCompleted == false)
-                                    .length,
-                                itemBuilder: (context, index) {
-                                  final todo = todos
-                                      .where(
-                                        (todo) => todo.isCompleted == false,
-                                      )
-                                      .elementAt(index);
-                                  return TodoListUi(
-                                    content: todo.content,
-                                    date: formatTime(todo.createdAt),
-                                    todoId: todo.id,
-                                    isSelectionMode: _isSelectionMode,
-                                    isSelected: _selectedTodoIds.contains(
-                                      todo.id,
-                                    ),
-                                    isCompleted: todo.isCompleted ?? false,
-                                    onTap: () => _onTodoTap(todo),
-                                    onLongPress: () =>
-                                        _onTodoLongPress(todo.id),
-                                    onCompletionChanged: (value) {
-                                      if (value != null) {
-                                        todoProvider.updateTodoCompletionStatus(
-                                          context,
-                                          todo.id,
-                                          value,
-                                        );
-                                      }
-                                    },
-                                  );
-                                },
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverList.builder(
+                        itemCount: incompleteTodos.length,
+                        itemBuilder: (context, index) {
+                          final todo = incompleteTodos[index];
+                          return TodoListUi(
+                            content: todo.content,
+                            date: formatTime(todo.createdAt),
+                            todoId: todo.id,
+                            isSelectionMode: _isSelectionMode,
+                            isSelected: _selectedTodoIds.contains(todo.id),
+                            isCompleted: todo.isCompleted ?? false,
+                            onTap: () => _onTodoTap(todo),
+                            onLongPress: () => _onTodoLongPress(todo.id),
+                            onCompletionChanged: (value) {
+                              if (value != null) {
+                                todoProvider.updateTodoCompletionStatus(
+                                  context,
+                                  todo.id,
+                                  value,
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                      if (completedTodos.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              top: 20.h,
+                              left: 5,
+                              bottom: 10.h,
+                            ),
+                            child: Text(
+                              'Completed Todos (${completedTodos.length})',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontFamily: googleFontNormal,
+                                color: whiteColor,
                               ),
-                            )
-                          : SizedBox(),
-                      todos
-                              .where((todo) => todo.isCompleted == false)
-                              .isNotEmpty
-                          ? SizedBox(height: 20.h)
-                          : SizedBox(),
-                      todos.where((todo) => todo.isCompleted == true).isNotEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: Text(
-                                'Completed Todos (${todos.where((todo) => todo.isCompleted == true).length})',
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontFamily: googleFontNormal,
-                                  color: whiteColor,
-                                ),
-                              ),
-                            )
-                          : SizedBox(),
-                      SizedBox(height: 10.h),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: todos
-                              .where((todo) => todo.isCompleted == true)
-                              .length,
-                          itemBuilder: (context, index) {
-                            final todo = todos
-                                .where((todo) => todo.isCompleted == true)
-                                .elementAt(index);
-                            return TodoListUi(
-                              content: todo.content,
-                              date: formatTime(todo.createdAt),
-                              todoId: todo.id,
-                              isSelectionMode: _isSelectionMode,
-                              isSelected: _selectedTodoIds.contains(todo.id),
-                              isCompleted: todo.isCompleted ?? false,
-                              onTap: () => _onTodoTap(todo),
-                              onLongPress: () => _onTodoLongPress(todo.id),
-                              onCompletionChanged: (value) {
-                                if (value != null) {
-                                  todoProvider.updateTodoCompletionStatus(
-                                    context,
-                                    todo.id,
-                                    value,
-                                  );
-                                }
-                              },
-                            );
-                          },
+                            ),
+                          ),
                         ),
+                      SliverList.builder(
+                        itemCount: completedTodos.length,
+                        itemBuilder: (context, index) {
+                          final todo = completedTodos[index];
+                          return TodoListUi(
+                            content: todo.content,
+                            date: formatTime(todo.createdAt),
+                            todoId: todo.id,
+                            isSelectionMode: _isSelectionMode,
+                            isSelected: _selectedTodoIds.contains(todo.id),
+                            isCompleted: todo.isCompleted ?? false,
+                            onTap: () => _onTodoTap(todo),
+                            onLongPress: () => _onTodoLongPress(todo.id),
+                            onCompletionChanged: (value) {
+                              if (value != null) {
+                                todoProvider.updateTodoCompletionStatus(
+                                  context,
+                                  todo.id,
+                                  value,
+                                );
+                              }
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),

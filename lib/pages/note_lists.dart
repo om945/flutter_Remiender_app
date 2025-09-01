@@ -9,7 +9,8 @@ import 'package:remiender_app/theme/note_list_ui.dart';
 import 'package:remiender_app/theme/theme.dart';
 
 class NotesList extends StatefulWidget {
-  const NotesList({super.key});
+  final String searchQuery;
+  const NotesList({super.key, required this.searchQuery});
 
   @override
   State<NotesList> createState() => _NotesListState();
@@ -18,8 +19,6 @@ class NotesList extends StatefulWidget {
 class _NotesListState extends State<NotesList> {
   bool _isLoading = false;
   final NoteService noteService = NoteService();
-
-  // State for selection mode
   bool _isSelectionMode = false;
   final Set<String> _selectedNoteIds = {};
 
@@ -30,6 +29,14 @@ class _NotesListState extends State<NotesList> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant NotesList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchQuery != widget.searchQuery) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadData() async {
@@ -82,12 +89,25 @@ class _NotesListState extends State<NotesList> {
     } else {
       // Navigate to edit page
       final result = await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => AddNotePage(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => AddNotePage(
             noteId: note.id,
             headline: note.headline,
             content: note.content,
           ),
+          transitionDuration: Duration(microseconds: 200),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1, 0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOut;
+
+            var tween = Tween(
+              begin: begin,
+              end: end,
+            ).chain(CurveTween(curve: curve));
+            var offsetAnimation = animation.drive(tween);
+            return SlideTransition(position: offsetAnimation, child: child);
+          },
         ),
       );
       if (result == true && mounted) {
@@ -199,7 +219,13 @@ class _NotesListState extends State<NotesList> {
           );
         }
 
-        final noteWidgets = notes
+        final filteredNotes = notes.where((note) {
+          final query = widget.searchQuery.toLowerCase();
+          return note.headline.toLowerCase().contains(query) ||
+              note.content.toLowerCase().contains(query);
+        }).toList();
+
+        final noteWidgets = filteredNotes
             .map((note) {
               try {
                 return NotesListUi(
@@ -211,6 +237,7 @@ class _NotesListState extends State<NotesList> {
                   isSelected: _selectedNoteIds.contains(note.id),
                   onTap: () => _onNoteTap(note),
                   onLongPress: () => _onNoteLongPress(note.id),
+                  isFavorite: note.isFavorite ?? false,
                 );
               } catch (e) {
                 return const SizedBox.shrink(); // Return empty widget on error
@@ -239,8 +266,8 @@ class _NotesListState extends State<NotesList> {
                                       )
                                       .isFavorite ==
                                   true)
-                          ? const Icon(Icons.star)
-                          : const Icon(Icons.star_border),
+                          ? const Icon(Icons.star, color: blackColor)
+                          : const Icon(Icons.star_border, color: blackColor),
                     ),
                     SizedBox(height: 10.h),
                     Row(
@@ -271,11 +298,30 @@ class _NotesListState extends State<NotesList> {
                   backgroundColor: blueColor,
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AddNotePage(),
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondryAnimation) =>
+                            const AddNotePage(),
+                        transitionDuration: Duration(microseconds: 200),
+                        transitionsBuilder:
+                            (context, animation, scondaryAnimation, child) {
+                              const begin = Offset(0, 1);
+                              const end = Offset(0, 0);
+                              const curve = Curves.easeInOut;
+                              var tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
                       ),
                     );
-                    if (result == true && mounted) _loadData();
+                    if (result == true && mounted) {
+                      _loadData();
+                    }
                   },
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),
                 ),

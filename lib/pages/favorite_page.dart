@@ -157,8 +157,10 @@ class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<NotesProvider>(
-      builder: (context, noteProvider, child) {
-        final notes = noteProvider.notes;
+      builder: (BuildContext context, NotesProvider noteProvider, Widget? child) {
+        final favoriteNotes = noteProvider.notes
+            .where((note) => note.isFavorite == true)
+            .toList();
 
         String formatTime(DateTime? dateTime) {
           if (dateTime == null) return 'No date';
@@ -189,25 +191,6 @@ class _FavoritePageState extends State<FavoritePage> {
           );
         }
 
-        final noteWidgets = notes
-            .map((note) {
-              try {
-                return NotesListUi(
-                  headline: note.headline,
-                  content: note.content,
-                  date: formatTime(note.uploadTime),
-                  noteId: note.id,
-                  isSelectionMode: _isSelectionMode,
-                  isSelected: _selectedNoteIds.contains(note.id),
-                  onTap: () => _onNoteTap(note),
-                  onLongPress: () => _onNoteLongPress(note.id),
-                );
-              } catch (e) {
-                return const SizedBox.shrink();
-              }
-            })
-            .where((widget) => widget is! SizedBox)
-            .toList();
         return Scaffold(
           appBar: AppBar(
             toolbarHeight: 80.h,
@@ -227,7 +210,7 @@ class _FavoritePageState extends State<FavoritePage> {
                         heroTag: 'favorite_button',
                         onPressed: _removeFavoriteNotes,
                         backgroundColor: blueColor,
-                        child: const Icon(Icons.star),
+                        child: const Icon(Icons.star, color: blackColor),
                       ),
                       SizedBox(height: 10.h),
                       Row(
@@ -256,7 +239,7 @@ class _FavoritePageState extends State<FavoritePage> {
                   ),
                 )
               : SizedBox.shrink(),
-          body: notes.where((note) => note.isFavorite == false).isNotEmpty
+          body: favoriteNotes.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: RefreshIndicator(
@@ -277,10 +260,24 @@ class _FavoritePageState extends State<FavoritePage> {
                     ),
                   ),
                 )
-              : Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListView(children: noteWidgets),
+              : Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ListView.builder(
+                    itemCount: favoriteNotes.length,
+                    itemBuilder: (context, index) {
+                      final note = favoriteNotes[index];
+                      return NotesListUi(
+                        headline: note.headline,
+                        content: note.content,
+                        date: formatTime(note.uploadTime),
+                        noteId: note.id,
+                        isSelectionMode: _isSelectionMode,
+                        isSelected: _selectedNoteIds.contains(note.id),
+                        onTap: () => _onNoteTap(note),
+                        onLongPress: () => _onNoteLongPress(note.id),
+                        isFavorite: false,
+                      );
+                    },
                   ),
                 ),
         );

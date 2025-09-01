@@ -7,6 +7,7 @@ import 'package:remiender_app/pages/note_lists.dart';
 import 'package:remiender_app/pages/todo_list.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
+import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,10 +18,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late TabController _tabcontroller;
+
+  bool _isSearching = false;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
     _tabcontroller = TabController(length: 2, vsync: this, initialIndex: 0);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    _tabcontroller.dispose();
+    super.dispose();
   }
 
   //signOut
@@ -84,31 +99,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         title: Padding(
           padding: const EdgeInsets.only(top: 20),
           child: Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  'Hello... ',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontFamily: googleFontNormal,
+            child: _isSearching
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    style: TextStyle(color: whiteColor, fontSize: 18.sp),
+                    decoration: InputDecoration(
+                      hintText: 'Search notes/todos...',
+                      hintStyle: TextStyle(
+                        color: faintwhiteColor,
+                        fontSize: 18.sp,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (query) {
+                      if (_debounce?.isActive ?? false) _debounce!.cancel();
+                      _debounce = Timer(const Duration(milliseconds: 500), () {
+                        setState(() {
+                          _searchQuery = query;
+                        });
+                      });
+                    },
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        'Hello... ',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontFamily: googleFontNormal,
+                        ),
+                      ),
+                      Text(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        user.name,
+                        style: TextStyle(
+                          fontSize: 25.sp,
+                          fontFamily: googleFontBold,
+                          color: blueColor,
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                    ],
                   ),
-                ),
-                Text(
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  user.name,
-                  style: TextStyle(
-                    fontSize: 25.sp,
-                    fontFamily: googleFontBold,
-                    color: blueColor,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-              ],
-            ),
           ),
         ),
         bottom: TabBar(
@@ -129,7 +166,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search_rounded)),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                  // Optionally, notify NotesList to clear search results
+                }
+              });
+            },
+            icon: Icon(_isSearching ? Icons.close : Icons.search_rounded),
+          ),
           IconButton(onPressed: showPopDialog, icon: const Icon(Icons.logout)),
           PopupMenuButton<String>(
             color: bgColor,
@@ -147,13 +196,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 PopupMenuItem(
                   onTap: () {
-                    Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute(builder: (_) => FavoritePage()));
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const FavoritePage(),
+                        transitionDuration: Duration(microseconds: 200),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(1, 0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+                              
+                              var tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
+                      ),
+                    );
                   },
                   value: 'Star Message',
                   child: Text(
-                    'Star Message',
+                    'Favorite Notes',
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontFamily: googleFontNormal,
@@ -169,7 +238,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         padding: const EdgeInsets.all(10.0),
         child: TabBarView(
           controller: _tabcontroller,
-          children: [NotesList(), TodoList()],
+          children: [
+            NotesList(searchQuery: _searchQuery),
+            TodoList(searchQuery: _searchQuery),
+          ],
         ),
       ),
     );

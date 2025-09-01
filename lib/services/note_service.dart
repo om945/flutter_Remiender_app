@@ -148,7 +148,7 @@ class NoteService {
         response: res,
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'Note status updated successfully!');
+          showSnackBar(context, 'Note favorite status updated successfully!');
         },
       );
     } catch (e) {
