@@ -224,13 +224,24 @@ class _SignupPageState extends State<SignupPage> {
                             hintText: "password",
                             obscureText: true,
                           ),
+                          !_isSignupView
+                              ? InkWell(
+                                  child: Text(
+                                    'Forgot password',
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                      color: blueColor,
+                                      fontFamily: googleFontFaintNormal,
+                                      fontSize: 15.sp,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox.shrink(),
                           SizedBox(height: 30.h),
                           Custombutton(
                             title: _isSignupView ? 'Sign Up' : 'Sign In',
                             action: _isSignupView ? signupUser : signinUser,
                           ),
-
-                          // 7. The old navigation row is removed.
                         ],
                       ),
                     ),
