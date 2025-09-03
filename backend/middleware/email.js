@@ -1,4 +1,7 @@
-import { Verification_Email_Template } from './emailTemplate.js';
+import {
+  Reset_Password_Email_Template,
+  Verification_Email_Template,
+} from './emailTemplate.js';
 import { transporter } from './otpService.js';
 
 async function sendVerificationCode(email, verificationCode) {
@@ -19,4 +22,18 @@ async function sendVerificationCode(email, verificationCode) {
   }
 }
 
-export { sendVerificationCode };
+async function sendPasswordResetOtp(email, otpCode) {
+  try {
+    const response = await transporter.sendMail({
+      from: '"Bankai" <ombelekar21@gmail.com>',
+      to: email,
+      subject: 'Password Reset OTP',
+      html: Reset_Password_Email_Template.replace('{otpCode}', otpCode),
+    });
+    console.log('Password reset OTP email sent successfully', response);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export { sendVerificationCode, sendPasswordResetOtp };

@@ -10,6 +10,9 @@ import {
   handleSignUp,
   handleTokenValidation,
   verifyEmail,
+  handleForgotPasswordRequest,
+  handleResetPasswordWithOtp,
+  handleVerifyResetOtp,
 } from '../controller/auth.js';
 
 const authRouter = express.Router();
@@ -24,5 +27,9 @@ authRouter.post('/api/tokenIsValid', handleTokenValidation);
 authRouter.get('/api/user', auth, handleGetUserData);
 
 authRouter.post('/api/verification', verifyEmail);
+
+authRouter.post('/api/forgot-password', handleForgotPasswordRequest);
+authRouter.post('/api/reset-password', handleResetPasswordWithOtp);
+authRouter.post('/api/verify-reset-otp', handleVerifyResetOtp);
 
 export default authRouter;

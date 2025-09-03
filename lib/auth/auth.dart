@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:remiender_app/auth/forgot_password_page.dart';
+import 'package:remiender_app/auth/otp_service_field.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
 
@@ -226,6 +228,14 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                           !_isSignupView
                               ? InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ForgotPasswordPage(),
+                                      ),
+                                    );
+                                  },
                                   child: Text(
                                     'Forgot password',
                                     textAlign: TextAlign.end,
@@ -241,6 +251,59 @@ class _SignupPageState extends State<SignupPage> {
                           Custombutton(
                             title: _isSignupView ? 'Sign Up' : 'Sign In',
                             action: _isSignupView ? signupUser : signinUser,
+                          ),
+                          SizedBox(height: 10.h),
+                          Center(
+                            child: Text(
+                              'Account is not verified? click here👇',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                fontFamily: googleFontSemiBold,
+                                color: blackColor,
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondryAnimation,
+                                        ) => const OtpServiceField(),
+                                    transitionDuration: Duration(
+                                      microseconds: 200,
+                                    ),
+                                    transitionsBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          scondaryAnimation,
+                                          child,
+                                        ) {
+                                          const begin = Offset(0, 1);
+                                          const end = Offset(0, 0);
+                                          const curve = Curves.easeInOut;
+                                          var tween = Tween(
+                                            begin: begin,
+                                            end: end,
+                                          ).chain(CurveTween(curve: curve));
+                                          var offsetAnimation = animation.drive(
+                                            tween,
+                                          );
+                                          return SlideTransition(
+                                            position: offsetAnimation,
+                                            child: child,
+                                          );
+                                        },
+                                  ),
+                                );
+                              },
+                              child: Text('Verify account'),
+                            ),
                           ),
                         ],
                       ),

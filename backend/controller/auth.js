@@ -1,7 +1,10 @@
 import bcryptjs from 'bcryptjs';
 import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
-import { sendVerificationCode } from '../middleware/email.js';
+import {
+  sendPasswordResetOtp,
+  sendVerificationCode,
+} from '../middleware/email.js';
 
 async function handleSignUp(req, res) {
   try {
@@ -25,16 +28,21 @@ async function handleSignUp(req, res) {
     });
     user = await user.save();
     sendVerificationCode(user.email, verificationCode);
+    console.log('Signup Verification Code:', verificationCode);
     res.json(user);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 }
 
-async function handleSignIn(rq, res) {
+async function handleSignIn(req, res) {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    const isVerify = await user.isVerify;
+    if (isVerify == false) {
+      return res.status(400).json({ msg: 'User is not verified' });
+    }
     if (!user) {
       return res
         .status(400)
@@ -98,10 +106,101 @@ async function verifyEmail(req, res) {
   }
 }
 
+async function handleForgotPasswordRequest(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ msg: 'User with this email does not exist!' });
+    }
+
+    const resetPasswordOtp = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+    user.resetPasswordOtp = resetPasswordOtp;
+    user.resetPasswordOtpExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+    console.log('Forgot Password OTP:', resetPasswordOtp);
+    console.log('OTP Expires At:', user.resetPasswordOtpExpires);
+
+    sendPasswordResetOtp(user.email, resetPasswordOtp);
+
+    res.status(200).json({ msg: 'Password reset OTP sent to your email.' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
+async function handleResetPasswordWithOtp(req, res) {
+  try {
+    const { email, otp, newPassword } = req.body;
+    console.log('Received Email:', email);
+    console.log('Received OTP:', otp);
+    console.log('Received New Password:', newPassword);
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.log('User not found for email:', email);
+      return res
+        .status(400)
+        .json({ msg: 'User with this email does not exist.' });
+    }
+    console.log('Stored OTP:', user.resetPasswordOtp);
+    console.log('Stored OTP Expires At:', user.resetPasswordOtpExpires);
+
+    if (
+      user.resetPasswordOtp !== otp ||
+      user.resetPasswordOtpExpires < Date.now()
+    ) {
+      console.log('OTP mismatch or expired.');
+      return res.status(400).json({ msg: 'Invalid or expired OTP.' });
+    }
+
+    const hashedPassword = await bcryptjs.hash(newPassword, 8);
+    user.password = hashedPassword;
+    user.resetPasswordOtp = undefined; // Clear the OTP
+    user.resetPasswordOtpExpires = undefined; // Clear the OTP expiration
+    await user.save();
+
+    res.status(200).json({ msg: 'Password reset successfully.' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
+async function handleVerifyResetOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ msg: 'User with this email does not exist.' });
+    }
+
+    if (
+      user.resetPasswordOtp !== otp ||
+      user.resetPasswordOtpExpires < Date.now()
+    ) {
+      return res.status(400).json({ msg: 'Invalid or expired OTP.' });
+    }
+
+    res.status(200).json({ msg: 'OTP verified successfully.' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
 export {
   handleGetUserData,
   handleSignUp,
   handleSignIn,
   handleTokenValidation,
   verifyEmail,
+  handleForgotPasswordRequest,
+  handleResetPasswordWithOtp,
+  handleVerifyResetOtp,
 };
