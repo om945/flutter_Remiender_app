@@ -10,19 +10,4 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = async () => {
-  try {
-    const info = await transporter.sendMail({
-      from: '"Bankai" <ombelekar21@gmail.com>',
-      to: 'ombelekar21@gmail.com',
-      subject: 'Hinokamikagura',
-      text: 'Hello world?', // plain‑text body
-      html: '<b>Hello world?</b>', // HTML body
-    });
-    console.log(info);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export { transporter, sendEmail };
+export { transporter };

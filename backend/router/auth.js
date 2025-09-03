@@ -9,22 +9,20 @@ import {
   handleSignIn,
   handleSignUp,
   handleTokenValidation,
+  verifyEmail,
 } from '../controller/auth.js';
 
 const authRouter = express.Router();
 
 //Sign Up
 authRouter.post('/api/signup', handleSignUp);
-
 //Sign In
 authRouter.post('/api/signin', handleSignIn);
-
 //validate token
 authRouter.post('/api/tokenIsValid', handleTokenValidation);
-
 //get user data
 authRouter.get('/api/user', auth, handleGetUserData);
 
-// authRouter.post('/api/verification');
+authRouter.post('/api/verification', verifyEmail);
 
 export default authRouter;

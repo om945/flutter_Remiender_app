@@ -1,7 +1,6 @@
 import bcryptjs from 'bcryptjs';
 import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
-import auth from '../middleware/auth.js';
 import { sendVerificationCode } from '../middleware/email.js';
 
 async function handleSignUp(req, res) {
@@ -80,4 +79,29 @@ async function handleGetUserData(req, res) {
   }
 }
 
-export { handleGetUserData, handleSignUp, handleSignIn, handleTokenValidation };
+async function verifyEmail(req, res) {
+  try {
+    const { code } = req.body;
+    const user = await User.findOne({ verificationCode: code });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'Invalid or Expired code' });
+    }
+
+    user.isVerify = true;
+    user.verificationCode = undefined;
+
+    await user.save();
+    return res.status(200).json({ msg: 'Email verify successfully' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
+export {
+  handleGetUserData,
+  handleSignUp,
+  handleSignIn,
+  handleTokenValidation,
+  verifyEmail,
+};
