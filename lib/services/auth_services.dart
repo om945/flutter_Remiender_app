@@ -128,6 +128,7 @@ class AuthServices {
       );
     } catch (e) {
       showSnackBar(context, e.toString());
+      // print(e.toString());
     }
   }
 
@@ -308,6 +309,32 @@ class AuthServices {
     }
   }
 
+  // Re-verification OTP
+  Future<void> reVerificationRequest({
+    required BuildContext context,
+    required String email,
+  }) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('${Constants.uri}/api/reverification'),
+        body: jsonEncode({'email': email}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, 'Re-verification OTP sent successfully!');
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
   Future<void> verifyOTP({
     required BuildContext context,
     required String email,
@@ -316,7 +343,10 @@ class AuthServices {
     try {
       http.Response res = await http.post(
         Uri.parse('${Constants.uri}/api/verification'),
-        body: jsonEncode({'email': email, 'otp': otp}),
+        body: jsonEncode({
+          'email': email,
+          'code': otp,
+        }), // Changed 'otp' to 'code'
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

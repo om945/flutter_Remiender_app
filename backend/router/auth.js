@@ -32,4 +32,6 @@ authRouter.post('/api/forgot-password', handleForgotPasswordRequest);
 authRouter.post('/api/reset-password', handleResetPasswordWithOtp);
 authRouter.post('/api/verify-reset-otp', handleVerifyResetOtp);
 
+// authRouter.post('/api/reverification', handleReverificationRequest);
+
 export default authRouter;

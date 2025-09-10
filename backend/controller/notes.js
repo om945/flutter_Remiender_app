@@ -1,5 +1,35 @@
 import Note from '../models/notes.js';
 import User from '../models/user.js';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+dotenv.config();
+
+// method to generate NOTES_IV and NOTES_KEY
+
+//  console.log("Key:", crypto.randomBytes(32).toString('hex')); // 32 bytes hex for aes-256-cbc
+//  console.log("IV: ", crypto.randomBytes(16).toString('hex')); // 16 bytes hex for aes-256-cbc
+
+const algorithm = 'aes-256-cbc';
+const key = Buffer.from(process.env.NOTES_KEY, 'hex');
+const iv = Buffer.from(process.env.NOTES_IV, 'hex');
+
+function encrypt(text) {
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  const encrypted = Buffer.concat([
+    cipher.update(text, 'utf8'),
+    cipher.final(),
+  ]);
+  return encrypted.toString('hex');
+}
+
+function decrypt(encrypted) {
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  const decrypted = Buffer.concat([
+    decipher.update(Buffer.from(encrypted, 'hex')),
+    decipher.final(),
+  ]);
+  return decrypted.toString('utf8');
+}
 
 async function handleGenerateNewNote(req, res) {
   const { headline, content, isFavorite } = req.body;
@@ -15,10 +45,12 @@ async function handleGenerateNewNote(req, res) {
     if (!content || content.trim().length === 0) {
       return res.status(400).json({ error: 'Content is required' });
     }
+    const encryptedHeadline = encrypt(headline || '');
+    const encryptedContent = encrypt(content);
 
     let note = new Note({
-      headline: headline || '',
-      content: content.trim(),
+      headline: encryptedHeadline,
+      content: encryptedContent,
       userId: user._id,
       isFavorite: isFavorite,
     });
@@ -35,7 +67,12 @@ async function handleGetNotes(req, res) {
   try {
     const userId = req.user;
     const notes = await Note.find({ userId });
-    res.json(notes);
+    const readableNotes = notes.map((note) => ({
+      ...note.toObject(),
+      headline: decrypt(note.headline),
+      content: decrypt(note.content),
+    }));
+    res.json(readableNotes);
   } catch (e) {
     console.error('Error in handleGetNotes:', e);
     res.status(500).json({ error: e.message });
@@ -67,8 +104,8 @@ async function handleEditNotes(req, res) {
         userId: userId, // Also ensure it belongs to the user
       },
       {
-        headline,
-        content,
+        headline: encrypt(headline || ''),
+        content: encrypt(content),
       },
       {
         new: true,
@@ -87,8 +124,8 @@ async function handleEditNotes(req, res) {
       success: true,
       message: 'Note edited successfully',
       note: {
-        headline: notes.headline,
-        content: notes.content,
+        headline: decrypt(notes.headline),
+        content: decrypt(notes.content),
         userId: notes.userId,
         _id: notes._id,
         createdAt: notes.createdAt,
@@ -111,7 +148,7 @@ async function handleDeleteNote(req, res) {
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: 'user not found',
+      message: 'User not found',
     });
   }
   if (!id) {
@@ -129,7 +166,7 @@ async function handleDeleteNote(req, res) {
     if (!deletnote) {
       return res.status(404).json({
         success: false,
-        message: 'faild to delete note',
+        message: 'Failed to delete note',
       });
     }
     return res.status(200).json({
@@ -186,10 +223,11 @@ async function handleUpdateFavorite(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: 'Note completion status updated successfully',
-      todo: {
-        content: note.content,
-        headline: note.headline,
+      message: 'Note favorite status updated successfully',
+      note: {
+        headline: decrypt(note.headline),
+        content: decrypt(note.content),
+        userId: note.userId,
         _id: note._id,
         createdAt: note.createdAt,
         updatedAt: note.updatedAt,

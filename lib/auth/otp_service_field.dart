@@ -21,6 +21,7 @@ class OtpServiceField extends StatefulWidget {
 
 class _OtpServiceFieldState extends State<OtpServiceField> {
   final TextEditingController _otpController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final FocusNode _otpFocusNode = FocusNode();
   final AuthServices authService = AuthServices();
 
@@ -35,14 +36,14 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
     if (widget.purpose == OtpPurpose.passwordReset) {
       authService.verifyResetOtp(
         context: context,
-        email: widget.email.toString(),
+        email: widget.email?.toString() ?? _emailController.text,
         otp: _otpController.text,
       );
       _otpController.clear();
     } else {
       authService.verifyOTP(
         context: context,
-        email: widget.email.toString(),
+        email: widget.email?.toString() ?? _emailController.text,
         otp: _otpController.text,
       );
     }
@@ -121,7 +122,15 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
                               fontSize: 15.sp,
                             ),
                           ),
-                          SizedBox(height: 40.h),
+                          SizedBox(height: 30.h),
+                          if (widget.email == null)
+                            Textfield(
+                              lableText: 'Email',
+                              hintText: 'Enter email',
+                              controller: _emailController,
+                              obscureText: false,
+                            ),
+                          SizedBox(height: 30.h),
                           Pinput(
                             length: 6,
                             controller:

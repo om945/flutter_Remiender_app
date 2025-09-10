@@ -10,11 +10,11 @@ async function sendVerificationCode(email, verificationCode) {
       from: '"Bankai" <ombelekar21@gmail.com>',
       to: email,
       subject: 'Email verification',
-      text: 'Verify your mail', // plain‑text body
+      text: 'Verify your mail',
       html: Verification_Email_Template.replace(
         '{verificationCode}',
         verificationCode
-      ), // HTML body
+      ),
     });
     console.log('email send successfully', response);
   } catch (error) {

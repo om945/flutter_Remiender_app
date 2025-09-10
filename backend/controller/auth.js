@@ -89,8 +89,8 @@ async function handleGetUserData(req, res) {
 
 async function verifyEmail(req, res) {
   try {
-    const { code } = req.body;
-    const user = await User.findOne({ verificationCode: code });
+    const { code, email } = req.body;
+    const user = await User.findOne({ verificationCode: code, email: email });
 
     if (!user) {
       return res.status(404).json({ msg: 'Invalid or Expired code' });
