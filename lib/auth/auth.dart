@@ -5,7 +5,7 @@ import 'package:remiender_app/auth/otp_service_field.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
 
-// 1. Converted to a StatefulWidget
+// 1. Converted to a StatefulWidgetb
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 

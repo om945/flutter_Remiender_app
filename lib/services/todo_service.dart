@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
@@ -8,7 +9,6 @@ import 'package:remiender_app/Provider/todo_provider.dart';
 import 'package:remiender_app/models/todo.dart';
 import 'package:remiender_app/utils/constants.dart';
 import 'package:remiender_app/utils/utils.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: depend_on_referenced_packages
 import 'package:timezone/data/latest.dart' as tz;
@@ -206,7 +206,9 @@ class TodoService {
       content,
       scheduledDate,
       platformChannelSpecifics,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.alarmClock,
+      matchDateTimeComponents:
+          DateTimeComponents.time, // Optional: adjust as needed
     );
   }
 

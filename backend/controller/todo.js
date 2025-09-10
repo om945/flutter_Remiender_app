@@ -1,5 +1,30 @@
 import Todo from '../models/todo.js';
 import User from '../models/user.js';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const algorithm = 'aes-256-cbc';
+const key = Buffer.from(process.env.NOTES_KEY, 'hex');
+const iv = Buffer.from(process.env.NOTES_IV, 'hex');
+
+function encrypt(text) {
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  const encrypted = Buffer.concat([
+    cipher.update(text, 'utf8'),
+    cipher.final(),
+  ]);
+  return encrypted.toString('hex');
+}
+
+function decrypt(encrypted) {
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  const decrypted = Buffer.concat([
+    decipher.update(Buffer.from(encrypted, 'hex')),
+    decipher.final(),
+  ]);
+  return decrypted.toString('utf8');
+}
 
 async function handleGenerateNewTodos(req, res) {
   const { content, reminderDate, isCompleted } = req.body;
@@ -13,14 +38,21 @@ async function handleGenerateNewTodos(req, res) {
     if (!content || content.trim().length === 0) {
       return res.status(400).json({ error: 'Content is required' });
     }
+    const encryptedContent = encrypt(content.trim());
     let todo = new Todo({
-      content: content.trim(),
+      content: encryptedContent,
       userId: user._id,
       reminderDate: reminderDate,
       isCompleted: isCompleted,
     });
     todo = await todo.save();
-    res.status(201).json(todo);
+
+    // Decrypt the content before sending it back to the client
+    const decryptedTodo = {
+      ...todo.toObject(),
+      content: decrypt(todo.content),
+    };
+    res.status(201).json(decryptedTodo);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -30,7 +62,11 @@ async function handleGetTodos(req, res) {
   try {
     const userId = req.user;
     const todo = await Todo.find({ userId });
-    res.json(todo);
+    const readableTodo = todo.map((todo) => ({
+      ...todo.toObject(),
+      content: decrypt(todo.content),
+    }));
+    res.json(readableTodo);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -61,7 +97,7 @@ async function handleEditTodos(req, res) {
         userId: userId,
       },
       {
-        content,
+        content: encrypt(content),
         reminderDate,
       },
       {
@@ -79,7 +115,7 @@ async function handleEditTodos(req, res) {
       success: true,
       message: 'Todo edited successfully',
       todo: {
-        content: todo.content,
+        content: decrypt(todo.content),
         userId: todo.userId,
         _id: todo._id,
         createdAt: todo.createdAt,
@@ -178,7 +214,7 @@ async function handleUpdateTodoCompletionStatus(req, res) {
       success: true,
       message: 'Todo completion status updated successfully',
       todo: {
-        content: todo.content,
+        content: decrypt(todo.content),
         userId: todo.userId,
         _id: todo._id,
         createdAt: todo.createdAt,

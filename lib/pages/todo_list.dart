@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/todo_provider.dart';
 import 'package:remiender_app/models/todo.dart';
@@ -378,11 +379,19 @@ class _TodoListState extends State<TodoList> {
         final completedTodos = filterTodos
             .where((todo) => todo.isCompleted == true)
             .toList();
-        String formatTime(DateTime? dateTime) {
+        String formatTime(DateTime? dateTime, {DateTime? reminderDate}) {
           if (dateTime == null) return 'No date';
           try {
-            // Format as 'yyyy-MM-dd'
-            return "${dateTime.year.toString().padLeft(4, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+            String datePart =
+                "${dateTime.year.toString().padLeft(4, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+            if (reminderDate != null) {
+              final localReminderDate = reminderDate.toLocal();
+              final String timePart = DateFormat(
+                'hh:mm a',
+              ).format(localReminderDate);
+              return '$datePart   scheduled at $timePart';
+            }
+            return datePart;
           } catch (e) {
             return 'Invalid date';
           }
@@ -453,7 +462,10 @@ class _TodoListState extends State<TodoList> {
                           final todo = incompleteTodos[index];
                           return TodoListUi(
                             content: todo.content,
-                            date: formatTime(todo.createdAt),
+                            date: formatTime(
+                              todo.createdAt,
+                              reminderDate: todo.reminderDate,
+                            ),
                             todoId: todo.id,
                             isSelectionMode: _isSelectionMode,
                             isSelected: _selectedTodoIds.contains(todo.id),
@@ -496,7 +508,10 @@ class _TodoListState extends State<TodoList> {
                           final todo = completedTodos[index];
                           return TodoListUi(
                             content: todo.content,
-                            date: formatTime(todo.createdAt),
+                            date: formatTime(
+                              todo.createdAt,
+                              reminderDate: todo.reminderDate,
+                            ),
                             todoId: todo.id,
                             isSelectionMode: _isSelectionMode,
                             isSelected: _selectedTodoIds.contains(todo.id),

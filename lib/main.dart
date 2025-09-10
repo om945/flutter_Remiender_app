@@ -43,6 +43,13 @@ class NotificationService {
       importance: Importance.max,
     );
 
+    // Request notification permissions for Android 13+
+    await FlutterLocalNotificationsPlugin()
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestNotificationsPermission();
+
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin

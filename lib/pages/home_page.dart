@@ -98,55 +98,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: bgColor,
         title: Padding(
           padding: const EdgeInsets.only(top: 20),
-          child: Flexible(
-            child: _isSearching
-                ? TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    style: TextStyle(color: whiteColor, fontSize: 18.sp),
-                    decoration: InputDecoration(
-                      hintText: 'Search notes/todos...',
-                      hintStyle: TextStyle(
-                        color: faintwhiteColor,
-                        fontSize: 18.sp,
-                      ),
-                      border: InputBorder.none,
+          child: _isSearching
+              ? TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  style: TextStyle(color: whiteColor, fontSize: 18.sp),
+                  decoration: InputDecoration(
+                    hintText: 'Search notes/todos...',
+                    hintStyle: TextStyle(
+                      color: faintwhiteColor,
+                      fontSize: 18.sp,
                     ),
-                    onChanged: (query) {
-                      if (_debounce?.isActive ?? false) _debounce!.cancel();
-                      _debounce = Timer(const Duration(milliseconds: 500), () {
-                        setState(() {
-                          _searchQuery = query;
-                        });
-                      });
-                    },
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        'Hello... ',
-                        style: TextStyle(
-                          fontSize: 20.sp,
-                          fontFamily: googleFontNormal,
-                        ),
-                      ),
-                      Text(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        user.name,
-                        style: TextStyle(
-                          fontSize: 25.sp,
-                          fontFamily: googleFontBold,
-                          color: blueColor,
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                    ],
+                    border: InputBorder.none,
                   ),
-          ),
+                  onChanged: (query) {
+                    if (_debounce?.isActive ?? false) _debounce!.cancel();
+                    _debounce = Timer(const Duration(milliseconds: 500), () {
+                      setState(() {
+                        _searchQuery = query;
+                      });
+                    });
+                  },
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      'Hello... ',
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontFamily: googleFontNormal,
+                      ),
+                    ),
+                    Text(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      user.name,
+                      style: TextStyle(
+                        fontSize: 25.sp,
+                        fontFamily: googleFontBold,
+                        color: blueColor,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                  ],
+                ),
         ),
         bottom: TabBar(
           controller: _tabcontroller,
@@ -206,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               const begin = Offset(1, 0);
                               const end = Offset.zero;
                               const curve = Curves.easeInOut;
-                              
+
                               var tween = Tween(
                                 begin: begin,
                                 end: end,
