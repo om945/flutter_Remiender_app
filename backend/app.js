@@ -1,10 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import mongoose from 'mongoose';
 import authRouter from './router/auth.js';
 import notesRouter from './router/notes.js';
 import todoRouter from './router/todos.js';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();

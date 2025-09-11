@@ -1,8 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import Note from '../models/notes.js';
 import User from '../models/user.js';
 import crypto from 'crypto';
-import dotenv from 'dotenv';
-dotenv.config();
 
 // method to generate NOTES_IV and NOTES_KEY
 

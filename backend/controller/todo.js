@@ -1,8 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import Todo from '../models/todo.js';
 import User from '../models/user.js';
 import crypto from 'crypto';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const algorithm = 'aes-256-cbc';
 const key = Buffer.from(process.env.NOTES_KEY, 'hex');
