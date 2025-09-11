@@ -70,12 +70,10 @@ class _MyAppState extends State<MyApp> {
           _isInitializing = true; // Show loading indicator on reconnect
         });
       }
-
       if (_connectivityResult != ConnectivityResult.none) {
         // Using context safely after a frame.
         await authService.getUserData(context);
       }
-
       if (mounted) {
         setState(() {
           _isInitializing = false;
