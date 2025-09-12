@@ -48,8 +48,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initialize();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      _updateConnectionStatus,
+    );
   }
 
   @override
@@ -78,8 +79,10 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future<void> _updateConnectionStatus(List<ConnectivityResult> result,
-      {bool isInitialCheck = false}) async {
+  Future<void> _updateConnectionStatus(
+    List<ConnectivityResult> result, {
+    bool isInitialCheck = false,
+  }) async {
     final newResult = result.contains(ConnectivityResult.none)
         ? ConnectivityResult.none
         : result.first;
@@ -142,7 +145,6 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _handleConnectionChange() async {
     if (!mounted) return;
-
     setState(() {
       _isInitializing = true;
     });
