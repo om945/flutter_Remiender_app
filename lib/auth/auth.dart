@@ -16,6 +16,7 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   // 2. State variable to track the view
   bool _isSignupView = true;
+  bool _isLoading = false;
 
   final TextEditingController userName = TextEditingController();
   final TextEditingController email = TextEditingController();
@@ -32,24 +33,39 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void signupUser() async {
-    authService.signUpUser(
+    setState(() {
+      _isLoading = true;
+    });
+    await authService.signUpUser(
       context: context,
       email: email.text,
       password: password.text,
       name: userName.text,
     );
-    userName.clear();
-    email.clear();
-    password.clear();
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   //function for signing in
-  void signinUser() {
-    authService.signInUser(
+  void signinUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await authService.signInUser(
       context: context,
       email: email.text,
       password: password.text,
     );
+    // The navigation on success will remove this widget from the tree.
+    // If there's an error, we need to stop the loading indicator.
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -250,7 +266,10 @@ class _SignupPageState extends State<SignupPage> {
                           SizedBox(height: 30.h),
                           Custombutton(
                             title: _isSignupView ? 'Sign Up' : 'Sign In',
-                            action: _isSignupView ? signupUser : signinUser,
+                            action: _isLoading
+                                ? null
+                                : (_isSignupView ? signupUser : signinUser),
+                            isLoading: _isLoading,
                           ),
                           SizedBox(height: 10.h),
                           Center(
@@ -392,27 +411,56 @@ class Textfield extends StatelessWidget {
 // button
 class Custombutton extends StatelessWidget {
   final String title;
-  final VoidCallback action;
+  final VoidCallback? action;
+  final bool isLoading;
 
-  const Custombutton({super.key, required this.title, required this.action});
+  const Custombutton({
+    super.key,
+    required this.title,
+    required this.action,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return MaterialButton(
-      color: blueColor,
+      color: action == null ? Colors.grey : blueColor,
       height: 40.h,
       minWidth: screenWidth,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
       onPressed: action,
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 18.sp,
-          fontFamily: googleFontSemiBold,
-          color: blackColor,
-        ),
-      ),
+      child: isLoading
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 20.h,
+                  width: 20.h,
+                  child: CircularProgressIndicator(
+                    color: blackColor,
+                    strokeWidth: 2,
+                  ),
+                ),
+                SizedBox(width: 10.w),
+                Text(
+                  'Please wait...',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontFamily: googleFontSemiBold,
+                    color: blackColor,
+                  ),
+                ),
+              ],
+            )
+          : Text(
+              title,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontFamily: googleFontSemiBold,
+                color: blackColor,
+              ),
+            ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -40,13 +41,21 @@ class _MyAppState extends State<MyApp> {
   final Connectivity _connectivity = Connectivity();
   final AuthServices authService = AuthServices();
   ConnectivityResult _connectivityResult = ConnectivityResult.none;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   bool _isInitializing = true;
 
   @override
   void initState() {
     super.initState();
     _initialize();
-    _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   Future<void> _initialize() async {
@@ -54,31 +63,30 @@ class _MyAppState extends State<MyApp> {
     await SchedulerBinding.instance.endOfFrame;
     if (!mounted) return;
 
-    final result = await _connectivity.checkConnectivity();
-    await _updateConnectionStatus(result);
+    List<ConnectivityResult> result;
+    try {
+      result = await _connectivity.checkConnectivity();
+      await _updateConnectionStatus(result, isInitialCheck: true);
+    } catch (e) {
+      // Handle potential errors from checkConnectivity
+      if (mounted) {
+        setState(() {
+          _connectivityResult = ConnectivityResult.none;
+          _isInitializing = false;
+        });
+      }
+    }
   }
 
-  Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> result,
+      {bool isInitialCheck = false}) async {
     final newResult = result.contains(ConnectivityResult.none)
         ? ConnectivityResult.none
         : result.first;
 
-    if (newResult != _connectivityResult) {
-      if (mounted) {
-        setState(() {
-          _connectivityResult = newResult;
-          _isInitializing = true; // Show loading indicator on reconnect
-        });
-      }
-      if (_connectivityResult != ConnectivityResult.none) {
-        // Using context safely after a frame.
-        await authService.getUserData(context);
-      }
-      if (mounted) {
-        setState(() {
-          _isInitializing = false;
-        });
-      }
+    if (newResult != _connectivityResult || isInitialCheck) {
+      _connectivityResult = newResult;
+      await _handleConnectionChange();
     }
   }
 
@@ -130,6 +138,24 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleConnectionChange() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isInitializing = true;
+    });
+
+    if (_connectivityResult != ConnectivityResult.none) {
+      await authService.getUserData(context);
+    }
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
   }
 }
 

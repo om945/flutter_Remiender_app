@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:remiender_app/auth/reset_password_page.dart';
 
 class AuthServices {
-  void signUpUser({
+  Future<void> signUpUser({
     required BuildContext context,
     required String email,
     required String password,
@@ -74,7 +74,7 @@ class AuthServices {
   }
 
   //sign In
-  void signInUser({
+  Future<void> signInUser({
     required BuildContext context,
     required String email,
     required String password,
@@ -128,7 +128,6 @@ class AuthServices {
       );
     } catch (e) {
       showSnackBar(context, e.toString());
-      // print(e.toString());
     }
   }
 
