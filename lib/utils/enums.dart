@@ -1,1 +1,0 @@
-enum OtpPurpose { emailVerification, passwordReset }
