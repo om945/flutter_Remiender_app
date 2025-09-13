@@ -193,6 +193,7 @@ class TodoService {
           priority: Priority.high,
           showWhen: false,
         );
+        
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails();
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
