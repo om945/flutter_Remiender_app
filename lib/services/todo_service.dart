@@ -74,11 +74,14 @@ class TodoService {
           // We parse it to get the definitive ID for the notification.
           final savedTodo = Todos.fromJson(jsonDecode(res.body));
 
-          if (reminderDate != null && reminderDate.isAfter(DateTime.now())) {
+          if (reminderDate != null &&
+              reminderDate.isAfter(DateTime.now()) &&
+              savedTodo.isCompleted != true) {
             scheduleNotification(savedTodo.id, content, reminderDate);
-          } else if (isUpdate) {
-            // If it's an update and the reminder is removed or in the past,
-            // cancel any existing notification.
+          } else {
+            // If it's an update, or the reminder is removed/in the past,
+            // or the todo is complete, cancel any existing notification
+            // to ensure we don't show a notification for it.
             cancelNotification(savedTodo.id);
           }
           // Refresh the todo list in the provider
@@ -113,7 +116,6 @@ class TodoService {
         onSuccess: () {
           // Decode the JSON string into a List of dynamic objects.
           final List<dynamic> decodedList = jsonDecode(res.body);
-
           // Map each item in the list to a Todos object and add them all.
           todos.addAll(
             decodedList.map(
@@ -193,7 +195,7 @@ class TodoService {
           priority: Priority.high,
           showWhen: false,
         );
-        
+
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails();
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
