@@ -75,7 +75,8 @@ async function handleGetTodos(req, res) {
 
 async function handleEditTodos(req, res) {
   const userId = req.user;
-  const { id, content, reminderDate } = req.body;
+  const { id } = req.params;
+  const { content, reminderDate } = req.body;
 
   if (!userId) {
     return res.status(400).json({

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
 import 'package:remiender_app/pages/favorite_page.dart';
 import 'package:remiender_app/pages/note_lists.dart';
+import 'package:remiender_app/pages/privacy_and_policy_page.dart';
 import 'package:remiender_app/pages/todo_list.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
@@ -65,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Navigator.pop(context);
               },
               child: Text(
-                'Cancle',
+                'No',
                 style: TextStyle(
                   color: blueColor,
                   fontFamily: googleFontNormal,
@@ -75,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             TextButton(
               onPressed: () => _signOut(context),
               child: Text(
-                'Delete',
+                'Yes',
                 style: TextStyle(
                   color: blueColor,
                   fontFamily: googleFontNormal,
@@ -183,16 +184,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             itemBuilder: (BuildContext context) {
               return [
                 PopupMenuItem(
-                  value: 'Setting',
-                  child: Text(
-                    'Setting',
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontFamily: googleFontNormal,
-                    ),
-                  ),
-                ),
-                PopupMenuItem(
                   onTap: () {
                     Navigator.of(context).push(
                       PageRouteBuilder(
@@ -221,6 +212,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   value: 'Star Message',
                   child: Text(
                     'Favorite Notes',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontFamily: googleFontNormal,
+                    ),
+                  ),
+                ),
+                PopupMenuItem(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const PrivacyAndPolicyPage(),
+                        transitionDuration: Duration(microseconds: 200),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(1, 0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+                              var tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
+                      ),
+                    );
+                  },
+                  value: 'Privacy & Policy',
+                  child: Text(
+                    'Privacy & Policy',
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontFamily: googleFontNormal,

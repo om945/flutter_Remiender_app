@@ -178,6 +178,13 @@ class _TodoListState extends State<TodoList> {
         }
       });
     } else {
+      // When editing, pre-fill the date and time pickers
+      if (todo.reminderDate != null) {
+        setState(() {
+          _selectedDate = todo.reminderDate;
+          _selectedTime = TimeOfDay.fromDateTime(todo.reminderDate!);
+        });
+      }
       todoField(content: todo.content, todoId: todo.id);
     }
   }
@@ -228,6 +235,7 @@ class _TodoListState extends State<TodoList> {
 
   void todoField({String? content, String? todoId}) {
     toDoController.text = content ?? '';
+    final isEditing = todoId != null && todoId.isNotEmpty;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -265,7 +273,7 @@ class _TodoListState extends State<TodoList> {
                       ),
                     ),
                     Text(
-                      'New To-Do',
+                      isEditing ? 'Edit To-Do' : 'New To-Do',
                       style: TextStyle(
                         color: whiteColor,
                         fontFamily: googleFontSemiBold,
@@ -306,7 +314,7 @@ class _TodoListState extends State<TodoList> {
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: faintwhiteColor),
                     ),
-                    hintText: 'New To-Do',
+                    hintText: isEditing ? 'Edit your to-do' : 'New To-Do',
                     hintStyle: TextStyle(
                       color: faintwhiteColor,
                       fontFamily: googleFontFaintNormal,

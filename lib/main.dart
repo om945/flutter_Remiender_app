@@ -79,6 +79,23 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> _handleConnectionChange() async {
+    if (!mounted) return;
+    setState(() {
+      _isInitializing = true;
+    });
+
+    if (_connectivityResult != ConnectivityResult.none) {
+      await authService.getUserData(context);
+    }
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
+  }
+
   Future<void> _updateConnectionStatus(
     List<ConnectivityResult> result, {
     bool isInitialCheck = false,
@@ -142,23 +159,6 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
-  Future<void> _handleConnectionChange() async {
-    if (!mounted) return;
-    setState(() {
-      _isInitializing = true;
-    });
-
-    if (_connectivityResult != ConnectivityResult.none) {
-      await authService.getUserData(context);
-    }
-
-    if (mounted) {
-      setState(() {
-        _isInitializing = false;
-      });
-    }
-  }
 }
 
 //Notification service
@@ -168,9 +168,7 @@ class NotificationService {
 
   static Future<void> init() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings(
-          '@mipmap/ic_launcher',
-        ); // Changed from 'app_icon' to 'ic_launcher'
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
