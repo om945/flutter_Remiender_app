@@ -57,6 +57,8 @@ flutter_launcher_icons:
   android: 'launcher_icon'
   ios: true
   image_path: 'assets/icon/planpad.png'
+  adaptive_icon_background: "#1A1A1A" # Example: a dark color matching your app theme
+  adaptive_icon_foreground: "assets/icon/planpad_foreground.png" # Your logo on a transparent background
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
@@ -66,7 +68,7 @@ flutter_launcher_icons:
   windows:
     generate: true
     image_path: 'assets/icon/planpad.png'
-    icon_size: 48 # min:48, max:256, default: 48
+    icon_size: 256 # Use a larger size for better quality
   macos:
     generate: true
     image_path: 'assets/icon/planpad.png'

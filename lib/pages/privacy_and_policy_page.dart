@@ -53,7 +53,7 @@ class PrivacyAndPolicyPage extends StatelessWidget {
                       launchUrl(Uri.parse('https://github.com/om945'));
                     },
                     child: Image.asset(
-                      "assets/images/github.png",
+                      "assets/image/github.png",
                       height: 30,
                       width: 30,
                     ),
@@ -68,7 +68,7 @@ class PrivacyAndPolicyPage extends StatelessWidget {
                       );
                     },
                     child: Image.asset(
-                      "assets/images/LinkedIn_.png",
+                      "assets/image/LinkedIn_.png",
                       height: 30,
                       width: 30,
                     ),

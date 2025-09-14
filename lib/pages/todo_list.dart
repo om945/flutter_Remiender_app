@@ -347,7 +347,7 @@ class _TodoListState extends State<TodoList> {
                   Padding(
                     padding: EdgeInsets.only(top: 10.h),
                     child: Text(
-                      'Reminder: ${_selectedDate != null ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}' : ''}${_selectedTime != null ? ' at ${_selectedTime!.format(context)}' : ''}',
+                      'Reminder: ${_selectedDate != null ? DateFormat('MMM dd, yyyy').format(_selectedDate!) : ''}${_selectedTime != null ? ' at ${_selectedTime!.format(context)}' : ''}',
                       style: TextStyle(
                         color: faintwhiteColor,
                         fontFamily: googleFontFaintNormal,
@@ -390,13 +390,30 @@ class _TodoListState extends State<TodoList> {
         String formatTime(DateTime? dateTime, {DateTime? reminderDate}) {
           if (dateTime == null) return 'No date';
           try {
-            String datePart =
-                "${dateTime.year.toString().padLeft(4, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+            // Format the creation date
+            String datePart = DateFormat('MMM dd, yyyy').format(dateTime);
+
             if (reminderDate != null) {
-              final localReminderDate = reminderDate.toLocal();
+              // Format the reminder time (already in local timezone from model)
               final String timePart = DateFormat(
                 'hh:mm a',
-              ).format(localReminderDate);
+              ).format(reminderDate);
+              DateFormat('MMM dd, yyyy').format(reminderDate);
+
+              // Check if reminder is today, tomorrow, or another day
+              final now = DateTime.now();
+              final today = DateTime(now.year, now.month, now.day);
+              final reminderDay = DateTime(
+                reminderDate.year,
+                reminderDate.month,
+                reminderDate.day,
+              );
+              final tomorrow = today.add(const Duration(days: 1));
+
+              if (reminderDay == today) {
+              } else if (reminderDay == tomorrow) {
+              } else {}
+
               return '$datePart   scheduled at $timePart';
             }
             return datePart;

@@ -71,9 +71,17 @@ class TodoService {
         onSuccess: () {
           showSnackBar(context, isUpdate ? 'Todo Updated' : 'Todo Saved');
           // The backend sends back the created/updated todo object.
-          // We parse it to get the definitive ID for the notification.
-          final savedTodo = Todos.fromJson(jsonDecode(res.body));
+          final responseData = jsonDecode(res.body);
+          final Map<String, dynamic> todoData;
 
+          // The backend response for an update nests the todo object,
+          // while a create returns it at the root. We handle both cases.
+          if (isUpdate && responseData.containsKey('todo')) {
+            todoData = responseData['todo'];
+          } else {
+            todoData = responseData;
+          }
+          final savedTodo = Todos.fromJson(todoData);
           if (reminderDate != null &&
               reminderDate.isAfter(DateTime.now()) &&
               savedTodo.isCompleted != true) {
