@@ -459,105 +459,127 @@ class _TodoListState extends State<TodoList> {
                   backgroundColor: blueColor,
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),
                 ),
-          body: todoProvider.todos.isEmpty
-              ? RefreshIndicator(
+          body: Builder(
+            builder: (context) {
+              if (todoProvider.todos.isEmpty) {
+                return RefreshIndicator(
                   onRefresh: _loadData,
                   child: ListView(
                     children: [
-                      Center(
-                        child: Text(
-                          'No Todos yet',
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontFamily: googleFontNormal,
-                            color: whiteColor,
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height / 4,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'No Todos yet',
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontFamily: googleFontNormal,
+                              color: whiteColor,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadData,
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverList.builder(
-                        itemCount: incompleteTodos.length,
-                        itemBuilder: (context, index) {
-                          final todo = incompleteTodos[index];
-                          return TodoListUi(
-                            content: todo.content,
-                            date: formatTime(
-                              todo.createdAt,
-                              reminderDate: todo.reminderDate,
-                            ),
-                            todoId: todo.id,
-                            isSelectionMode: _isSelectionMode,
-                            isSelected: _selectedTodoIds.contains(todo.id),
-                            isCompleted: todo.isCompleted ?? false,
-                            onTap: () => _onTodoTap(todo),
-                            onLongPress: () => _onTodoLongPress(todo.id),
-                            onCompletionChanged: (value) {
-                              if (value != null) {
-                                todoProvider.updateTodoCompletionStatus(
-                                  context,
-                                  todo.id,
-                                  value,
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                      if (completedTodos.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top: 20.h,
-                              left: 5,
-                              bottom: 10.h,
-                            ),
-                            child: Text(
-                              'Completed Todos (${completedTodos.length})',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                fontFamily: googleFontNormal,
-                                color: whiteColor,
-                              ),
+                );
+              }
+              if (widget.searchQuery.isNotEmpty && filterTodos.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No results found',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontFamily: googleFontNormal,
+                      color: whiteColor,
+                    ),
+                  ),
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: _loadData,
+                child: CustomScrollView(
+                  slivers: [
+                    SliverList.builder(
+                      itemCount: incompleteTodos.length,
+                      itemBuilder: (context, index) {
+                        final todo = incompleteTodos[index];
+                        return TodoListUi(
+                          content: todo.content,
+                          date: formatTime(
+                            todo.createdAt,
+                            reminderDate: todo.reminderDate,
+                          ),
+                          todoId: todo.id,
+                          isSelectionMode: _isSelectionMode,
+                          isSelected: _selectedTodoIds.contains(todo.id),
+                          isCompleted: todo.isCompleted ?? false,
+                          onTap: () => _onTodoTap(todo),
+                          onLongPress: () => _onTodoLongPress(todo.id),
+                          onCompletionChanged: (value) {
+                            if (value != null) {
+                              todoProvider.updateTodoCompletionStatus(
+                                context,
+                                todo.id,
+                                value,
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
+                    if (completedTodos.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: 20.h,
+                            left: 5,
+                            bottom: 10.h,
+                          ),
+                          child: Text(
+                            'Completed Todos (${completedTodos.length})',
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontFamily: googleFontNormal,
+                              color: whiteColor,
                             ),
                           ),
                         ),
-                      SliverList.builder(
-                        itemCount: completedTodos.length,
-                        itemBuilder: (context, index) {
-                          final todo = completedTodos[index];
-                          return TodoListUi(
-                            content: todo.content,
-                            date: formatTime(
-                              todo.createdAt,
-                              reminderDate: todo.reminderDate,
-                            ),
-                            todoId: todo.id,
-                            isSelectionMode: _isSelectionMode,
-                            isSelected: _selectedTodoIds.contains(todo.id),
-                            isCompleted: todo.isCompleted ?? false,
-                            onTap: () => _onTodoTap(todo),
-                            onLongPress: () => _onTodoLongPress(todo.id),
-                            onCompletionChanged: (value) {
-                              if (value != null) {
-                                todoProvider.updateTodoCompletionStatus(
-                                  context,
-                                  todo.id,
-                                  value,
-                                );
-                              }
-                            },
-                          );
-                        },
                       ),
-                    ],
-                  ),
+                    SliverList.builder(
+                      itemCount: completedTodos.length,
+                      itemBuilder: (context, index) {
+                        final todo = completedTodos[index];
+                        return TodoListUi(
+                          content: todo.content,
+                          date: formatTime(
+                            todo.createdAt,
+                            reminderDate: todo.reminderDate,
+                          ),
+                          todoId: todo.id,
+                          isSelectionMode: _isSelectionMode,
+                          isSelected: _selectedTodoIds.contains(todo.id),
+                          isCompleted: todo.isCompleted ?? false,
+                          onTap: () => _onTodoTap(todo),
+                          onLongPress: () => _onTodoLongPress(todo.id),
+                          onCompletionChanged: (value) {
+                            if (value != null) {
+                              todoProvider.updateTodoCompletionStatus(
+                                context,
+                                todo.id,
+                                value,
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ],
                 ),
+              );
+            },
+          ),
         );
       },
     );

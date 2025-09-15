@@ -325,12 +325,16 @@ class _NotesListState extends State<NotesList> {
                   },
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),
                 ),
-          body: notes.isEmpty
-              ? RefreshIndicator(
-                  onRefresh: _loadData,
-                  child: ListView(
-                    children: [
-                      Center(
+          body: Builder(builder: (context) {
+            if (notes.isEmpty) {
+              return RefreshIndicator(
+                onRefresh: _loadData,
+                child: ListView(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height / 4),
+                      child: Center(
                         child: Text(
                           'No notes yet',
                           style: TextStyle(
@@ -340,13 +344,24 @@ class _NotesListState extends State<NotesList> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadData,
-                  child: ListView(children: noteWidgets),
+                    ),
+                  ],
                 ),
+              );
+            }
+            if (widget.searchQuery.isNotEmpty && filteredNotes.isEmpty) {
+              return Center(
+                  child: Text('No results found',
+                      style: TextStyle(
+                          fontSize: 20.sp,
+                          fontFamily: googleFontNormal,
+                          color: whiteColor)));
+            }
+            return RefreshIndicator(
+              onRefresh: _loadData,
+              child: ListView(children: noteWidgets),
+            );
+          }),
         );
       },
     );

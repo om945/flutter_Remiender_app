@@ -3,15 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:remiender_app/theme/theme.dart';
 
 class NetworkError extends StatelessWidget {
-  const NetworkError({super.key});
+  final VoidCallback onRetry;
+  const NetworkError({super.key, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 150.h),
             Image.asset(
               'assets/network_error.png',
               fit: BoxFit.cover,
@@ -19,19 +20,26 @@ class NetworkError extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             Text(
-              'Something went wrong',
-              style: TextStyle(fontFamily: googleFontBold, fontSize: 18.sp),
+              'No Internet Connection',
+              style: TextStyle(
+                fontFamily: googleFontBold,
+                fontSize: 18.sp,
+                color: whiteColor,
+              ),
             ),
             SizedBox(height: 20.h),
             MaterialButton(
-              onPressed: () {},
-              color: Colors.blue,
+              onPressed: onRetry,
+              color: blueColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.r),
               ),
               child: Text(
                 'Retry',
-                style: TextStyle(fontFamily: googleFontSemiBold),
+                style: TextStyle(
+                  fontFamily: googleFontSemiBold,
+                  color: blackColor,
+                ),
               ),
             ),
           ],

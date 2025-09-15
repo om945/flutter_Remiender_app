@@ -19,6 +19,7 @@ class PrivacyAndPolicyPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             RichText(
               text: TextSpan(
@@ -41,7 +42,7 @@ class PrivacyAndPolicyPage extends StatelessWidget {
                 ],
               ),
             ),
-            // SizedBox(height: 10.h),
+            SizedBox(height: 20.h),
             Text('• Contact us:', style: TextStyle(fontSize: 16)),
             SizedBox(height: 5),
             Padding(

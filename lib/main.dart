@@ -138,7 +138,7 @@ class _MyAppState extends State<MyApp> {
         home: Builder(
           builder: (context) {
             if (_connectivityResult == ConnectivityResult.none) {
-              return const NetworkError();
+              return NetworkError(onRetry: _initialize);
             }
             if (_isInitializing) {
               return const Scaffold(
