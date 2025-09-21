@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pinput/pinput.dart';
@@ -24,11 +25,37 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
   final TextEditingController _emailController = TextEditingController();
   final FocusNode _otpFocusNode = FocusNode();
   final AuthServices authService = AuthServices();
+  Timer? _timer;
+  int _start = 60;
+  bool _isResendButtonDisabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void startTimer() {
+    setState(() {
+      _isResendButtonDisabled = true;
+    });
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      if (_start == 0) {
+        setState(() {
+          timer.cancel();
+          _isResendButtonDisabled = false;
+          _start = 30;
+        });
+      } else {
+        setState(() => _start--);
+      }
+    });
+  }
 
   @override
   void dispose() {
     _otpController.dispose();
     _otpFocusNode.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -46,6 +73,16 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
         email: widget.email?.toString() ?? _emailController.text,
         otp: _otpController.text,
       );
+    }
+  }
+
+  void resendOtp() {
+    if (!_isResendButtonDisabled) {
+      authService.reVerificationRequest(
+        context: context,
+        email: widget.email?.toString() ?? _emailController.text,
+      );
+      startTimer();
     }
   }
 
@@ -114,6 +151,8 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
                           Text(
                             widget.purpose == OtpPurpose.passwordReset
                                 ? 'A password reset OTP is sent to your ${widget.email != null ? "(${widget.email}) email" : "email"}'
+                                : widget.email == null
+                                ? 'Verification code is already sent to your email'
                                 : 'Verification code is sent to your ${widget.email != null ? "(${widget.email}) email" : "email"}',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -122,7 +161,7 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
                               fontSize: 15.sp,
                             ),
                           ),
-                          SizedBox(height: 30.h),
+                          SizedBox(height: 10.h),
                           if (widget.email == null)
                             Textfield(
                               lableText: 'Email',
@@ -149,6 +188,32 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
                           SizedBox(height: 30.h),
                           Custombutton(title: 'Verify otp', action: verifyOTP),
                           SizedBox(height: 20.h),
+                          if (widget.purpose == OtpPurpose.emailVerification)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Didn't receive the code? ",
+                                  style: TextStyle(
+                                    color: blackColor,
+                                    fontFamily: googleFontNormal,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: resendOtp,
+                                  child: Text(
+                                    _isResendButtonDisabled
+                                        ? 'Resend in $_start'
+                                        : 'Resend Code',
+                                    style: TextStyle(
+                                      color: _isResendButtonDisabled
+                                          ? Colors.grey
+                                          : blueColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),

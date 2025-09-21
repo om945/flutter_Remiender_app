@@ -68,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Text(
                 'No',
                 style: TextStyle(
+                  fontSize: 15.sp,
                   color: blueColor,
                   fontFamily: googleFontNormal,
                 ),
@@ -76,8 +77,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             TextButton(
               onPressed: () => _signOut(context),
               child: Text(
-                'Yes',
+                'Sign out',
                 style: TextStyle(
+                  fontSize: 15.sp,
                   color: blueColor,
                   fontFamily: googleFontNormal,
                 ),

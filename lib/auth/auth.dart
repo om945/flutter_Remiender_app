@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:remiender_app/auth/forgot_password_page.dart';
-import 'package:remiender_app/auth/otp_service_field.dart';
+import 'package:remiender_app/auth/verification_service.dart';
 import 'package:remiender_app/services/auth_services.dart';
 import 'package:remiender_app/theme/theme.dart';
 

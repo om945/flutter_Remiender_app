@@ -194,6 +194,33 @@ async function handleVerifyResetOtp(req, res) {
   }
 }
 
+async function handleResendVerificationCode(req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ msg: 'User with this email does not exist!' });
+    }
+
+    if (user.isVerify) {
+      return res.status(400).json({ msg: 'This account is already verified.' });
+    }
+
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+    user.verificationCode = verificationCode;
+    await user.save();
+
+    sendVerificationCode(user.email, verificationCode);
+    res.status(200).json({ msg: 'A new verification code has been sent.' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
 export {
   handleGetUserData,
   handleSignUp,
@@ -203,4 +230,5 @@ export {
   handleForgotPasswordRequest,
   handleResetPasswordWithOtp,
   handleVerifyResetOtp,
+  handleResendVerificationCode,
 };

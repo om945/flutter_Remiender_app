@@ -62,7 +62,6 @@ class _AddNotePageState extends State<AddNotePage> {
           style: TextStyle(fontFamily: googleFontNormal, color: whiteColor),
         ), // Show appropriate title
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.share)),
           IconButton(
             onPressed: addNote,
             icon: Icon(isEditing ? Icons.update : Icons.save_alt_rounded),

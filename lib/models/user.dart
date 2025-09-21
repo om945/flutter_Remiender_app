@@ -29,7 +29,13 @@ class User {
   }
 
   Map<String, dynamic> toMap() {
-    return {'name': name, 'email': email, 'token': token, 'password': password, 'otp': otp};
+    return {
+      'name': name,
+      'email': email,
+      'token': token,
+      'password': password,
+      'otp': otp,
+    };
   }
 
   String toJson() => json.encode(toMap());

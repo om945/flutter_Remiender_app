@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:remiender_app/Provider/user_provider.dart';
 import 'package:remiender_app/auth/auth.dart';
-import 'package:remiender_app/auth/otp_service_field.dart';
+import 'package:remiender_app/auth/verification_service.dart';
 import 'package:remiender_app/models/user.dart';
 import 'package:remiender_app/pages/home_page.dart';
 import 'package:remiender_app/utils/constants.dart';
@@ -321,12 +321,14 @@ class AuthServices {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
-
+      if (email.isEmpty) {
+        showSnackBar(context, 'Please enter your email');
+      }
       httpErrorHandle(
         response: res,
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'Re-verification OTP sent successfully!');
+          showSnackBar(context, 'A new verification code has been sent.');
         },
       );
     } catch (e) {
