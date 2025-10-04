@@ -319,7 +319,7 @@ class AuthServices {
         },
       );
       if (email.isEmpty) {
-        showSnackBar(context, 'Please enter your email');
+        return showSnackBar(context, 'Please enter your email');
       }
       httpErrorHandle(
         response: res,
