@@ -64,11 +64,6 @@ class AuthServices {
                   },
             ),
           );
-
-          //  showSnackBar(
-          //   context,
-          //   'Account created! Login with the same credentials!',
-          // );
         },
       );
     } catch (e) {
@@ -249,7 +244,7 @@ class AuthServices {
 
       if (token == null || token.isEmpty) {
         await pref.setString('x-auth-token', '');
-        return; // Exit early if no token
+        return; 
       }
 
       // Validate token
@@ -276,15 +271,12 @@ class AuthServices {
         if (userRes.statusCode == 200) {
           userProvider.setUser(userRes.body);
         } else {
-          // If user data fetch fails, clear the token
           await pref.setString('x-auth-token', '');
         }
       } else {
-        // If token is invalid, clear it
         await pref.setString('x-auth-token', '');
       }
     } catch (e) {
-      // If any error occurs, clear the token and show error
       SharedPreferences pref = await SharedPreferences.getInstance();
       await pref.setString('x-auth-token', '');
       showSnackBar(context, 'Authentication error: ${e.toString()}');
@@ -350,7 +342,7 @@ class AuthServices {
         body: jsonEncode({
           'email': email,
           'code': otp,
-        }), // Changed 'otp' to 'code'
+        }),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NoteService {
   Future<void> addNote({
     required BuildContext context,
-    String? noteId, // Add note ID parameter
+    String? noteId, 
     required String headline,
     required String content,
     required bool isUpdate,
@@ -19,7 +19,7 @@ class NoteService {
     try {
       final user = Provider.of<UserProvider>(context, listen: false).user;
       Notes notes = Notes(
-        id: noteId ?? '', // Use provided note ID or empty string
+        id: noteId ?? '', 
         userId: user.id,
         headline: headline,
         content: content,
@@ -35,11 +35,8 @@ class NoteService {
         );
         return;
       }
-
-      // Determine the endpoint based on whether it's an update or create
       String endpoint;
       if (isUpdate) {
-        // For updates, use the same endpoint but with PATCH method
         endpoint = '${Constants.uri}/api/notes';
       } else {
         endpoint = '${Constants.uri}/api/notes';
@@ -50,7 +47,7 @@ class NoteService {
                 Uri.parse(endpoint),
                 body: jsonEncode({
                   ...notes.toJson(),
-                  'id': noteId, // Ensure ID is included in body for updates
+                  'id': noteId, 
                 }),
                 headers: <String, String>{
                   'Content-Type': 'application/json; charset=UTF-8',
@@ -93,22 +90,16 @@ class NoteService {
         response: res,
         context: context,
         onSuccess: () {
-          // The backend returns a direct JSON array of notes.
           final List<dynamic> responseData = jsonDecode(res.body);
-
-          // Use a more functional approach to parse the notes.
-          // This is robust against malformed items in the list.
           notes.addAll(
             responseData.whereType<Map<String, dynamic>>().map((noteData) {
               try {
                 return Notes.fromJson(noteData);
               } catch (e) {
-                // Log or silently ignore individual parsing errors
-                // to prevent one bad note from stopping the whole process.
                 debugPrint('Could not parse note: $e');
                 return null;
               }
-            }).whereType<Notes>(), // Filter out any nulls from failed parses
+            }).whereType<Notes>(), 
           );
         },
       );

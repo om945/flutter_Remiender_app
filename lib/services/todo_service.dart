@@ -70,12 +70,9 @@ class TodoService {
         context: context,
         onSuccess: () {
           showSnackBar(context, isUpdate ? 'Todo Updated' : 'Todo Saved');
-          // The backend sends back the created/updated todo object.
           final responseData = jsonDecode(res.body);
           final Map<String, dynamic> todoData;
 
-          // The backend response for an update nests the todo object,
-          // while a create returns it at the root. We handle both cases.
           if (isUpdate && responseData.containsKey('todo')) {
             todoData = responseData['todo'];
           } else {
@@ -87,12 +84,8 @@ class TodoService {
               savedTodo.isCompleted != true) {
             scheduleNotification(savedTodo.id, content, reminderDate);
           } else {
-            // If it's an update, or the reminder is removed/in the past,
-            // or the todo is complete, cancel any existing notification
-            // to ensure we don't show a notification for it.
             cancelNotification(savedTodo.id);
           }
-          // Refresh the todo list in the provider
           Provider.of<TodoProvider>(
             context,
             listen: false,
@@ -122,9 +115,7 @@ class TodoService {
         response: res,
         context: context,
         onSuccess: () {
-          // Decode the JSON string into a List of dynamic objects.
           final List<dynamic> decodedList = jsonDecode(res.body);
-          // Map each item in the list to a Todos object and add them all.
           todos.addAll(
             decodedList.map(
               (item) => Todos.fromJson(item as Map<String, dynamic>),

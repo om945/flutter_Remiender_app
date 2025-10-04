@@ -61,10 +61,10 @@ class _TodoListState extends State<TodoList> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
-              primary: blueColor, // Header background color
-              onPrimary: blackColor, // Header text color
-              surface: blackColor, // Body background color
-              onSurface: whiteColor, // Body text color
+              primary: blueColor, 
+              onPrimary: blackColor,
+              surface: blackColor, 
+              onSurface: whiteColor,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -91,14 +91,14 @@ class _TodoListState extends State<TodoList> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
-              primary: blueColor, // Header background color
-              onPrimary: blackColor, // Header text color
-              surface: blackColor, // Body background color
-              onSurface: whiteColor, // Body text color
+              primary: blueColor,
+              onPrimary: blackColor, 
+              surface: blackColor, 
+              onSurface: whiteColor,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: blueColor, // Button text color
+                foregroundColor: blueColor, 
               ),
             ),
           ),
@@ -138,14 +138,13 @@ class _TodoListState extends State<TodoList> {
     Navigator.pop(context); // Close the modal after saving
   }
 
-  // ignore: unused_element
   Future<void> _loadData() async {
     if (!mounted) return;
 
     setState(() {
       _isLoading = true;
     });
-    // Fetch todos using TodoProvider
+    
     await Provider.of<TodoProvider>(
       context,
       listen: false,
@@ -178,7 +177,6 @@ class _TodoListState extends State<TodoList> {
         }
       });
     } else {
-      // When editing, pre-fill the date and time pickers
       if (todo.reminderDate != null) {
         setState(() {
           _selectedDate = todo.reminderDate;
@@ -394,13 +392,11 @@ class _TodoListState extends State<TodoList> {
             String datePart = DateFormat('MMM dd, yyyy').format(dateTime);
 
             if (reminderDate != null) {
-              // Format the reminder time (already in local timezone from model)
               final String timePart = DateFormat(
                 'hh:mm a',
               ).format(reminderDate);
               DateFormat('MMM dd, yyyy').format(reminderDate);
 
-              // Check if reminder is today, tomorrow, or another day
               final now = DateTime.now();
               final today = DateTime(now.year, now.month, now.day);
               final reminderDay = DateTime(

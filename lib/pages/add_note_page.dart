@@ -35,7 +35,7 @@ class _AddNotePageState extends State<AddNotePage> {
   void addNote() async {
     await noteService.addNote(
       context: context,
-      noteId: widget.noteId, // Pass note ID for updates
+      noteId: widget.noteId, 
       headline: headlineController.text.trim(),
       content: contentController.text.trim(),
       isUpdate:
@@ -45,7 +45,6 @@ class _AddNotePageState extends State<AddNotePage> {
 
     // Refresh the notes list
     if (mounted) {
-      // Navigate back to the notes list
       Navigator.of(context).pop(true);
     }
   }

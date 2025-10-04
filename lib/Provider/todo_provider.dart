@@ -18,7 +18,7 @@ class TodoProvider extends ChangeNotifier {
     todos.sort((a, b) {
       final dateTimeA = a.createdAt;
       final dateTimeB =
-          b.createdAt; // Corrected to use b.createdAt for comparison
+          b.createdAt; 
 
       if (dateTimeA == null && dateTimeB == null) {
         return 0;
@@ -62,9 +62,7 @@ class TodoProvider extends ChangeNotifier {
       final int index = _todos.indexWhere((todo) => todo.id == todoId);
       if (index != -1) {
         _todos[index] = _todos[index].copyWith(isCompleted: isCompleted);
-        // Call setTodos to re-sort and notify listeners
         setTodos(List.from(_todos));
-        // If the todo is marked as complete, cancel its notification
         if (isCompleted) {
           TodoService().cancelNotification(todoId);
         }
