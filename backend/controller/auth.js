@@ -9,6 +9,21 @@ import {
 async function handleSignUp(req, res) {
   try {
     const { name, email, password } = req.body;
+
+    if (!password || password.length < 8) {
+      return res
+        .status(400)
+        .json({ msg: 'Password must be at least 8 characters long.' });
+    }
+
+    // Regex to check for at least one letter and one number
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        msg: 'Password must contain at least one letter and one number.',
+      });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res

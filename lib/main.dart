@@ -187,8 +187,8 @@ class NotificationService {
     // Create a notification channel for Android
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'todo_reminders', // id
-      'Todo Reminders', // title
-      description: 'Notifications for your todo list reminders', // description
+      'Todo Reminders',
+      description: 'Notifications for your todo reminders', // description
       importance: Importance.max,
     );
 
@@ -204,8 +204,6 @@ class NotificationService {
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.createNotificationChannel(channel);
-    // Request exact alarm permission for Android 12+.
-    // Note: This will open the app settings if the permission is not granted.
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin

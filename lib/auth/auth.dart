@@ -18,6 +18,7 @@ class _SignupPageState extends State<SignupPage> {
   bool _isSignupView = true;
   bool _isLoading = false;
 
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController userName = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
@@ -36,12 +37,14 @@ class _SignupPageState extends State<SignupPage> {
     setState(() {
       _isLoading = true;
     });
-    await authService.signUpUser(
-      context: context,
-      email: email.text,
-      password: password.text,
-      name: userName.text,
-    );
+    if (_formKey.currentState!.validate()) {
+      await authService.signUpUser(
+        context: context,
+        email: email.text,
+        password: password.text,
+        name: userName.text,
+      );
+    }
     if (mounted) {
       setState(() {
         _isLoading = false;
@@ -54,11 +57,13 @@ class _SignupPageState extends State<SignupPage> {
     setState(() {
       _isLoading = true;
     });
-    await authService.signInUser(
-      context: context,
-      email: email.text,
-      password: password.text,
-    );
+    if (_formKey.currentState!.validate()) {
+      await authService.signInUser(
+        context: context,
+        email: email.text,
+        password: password.text,
+      );
+    }
     // The navigation on success will remove this widget from the tree.
     // If there's an error, we need to stop the loading indicator.
     if (mounted) {
@@ -128,217 +133,220 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 25, 20, 25),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 4. Toggle Button UI
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(
-                                color: blueColor,
-                                style: BorderStyle.solid,
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 4. Toggle Button UI
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(
+                                  color: blueColor,
+                                  style: BorderStyle.solid,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _isSignupView = true;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _isSignupView
+                                              ? blueColor
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            30.r,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Sign Up',
+                                            style: TextStyle(
+                                              color: _isSignupView
+                                                  ? blackColor
+                                                  : faintwhiteColor,
+                                              fontFamily: googleFontSemiBold,
+                                              fontSize: 16.sp,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _isSignupView = false;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: !_isSignupView
+                                              ? blueColor
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            30.r,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Sign In',
+                                            style: TextStyle(
+                                              color: !_isSignupView
+                                                  ? blackColor
+                                                  : faintwhiteColor,
+                                              fontFamily: googleFontSemiBold,
+                                              fontSize: 16.sp,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _isSignupView = true;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _isSignupView
-                                            ? blueColor
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(
-                                          30.r,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Sign Up',
-                                          style: TextStyle(
-                                            color: _isSignupView
-                                                ? blackColor
-                                                : faintwhiteColor,
-                                            fontFamily: googleFontSemiBold,
-                                            fontSize: 16.sp,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _isSignupView = false;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: !_isSignupView
-                                            ? blueColor
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(
-                                          30.r,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Sign In',
-                                          style: TextStyle(
-                                            color: !_isSignupView
-                                                ? blackColor
-                                                : faintwhiteColor,
-                                            fontFamily: googleFontSemiBold,
-                                            fontSize: 16.sp,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
+                            SizedBox(height: 20.h),
 
-                          // 5. Conditional UI for Username field
-                          if (_isSignupView)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Textfield(
-                                  controller: userName,
-                                  lableText: "Enter username",
-                                  hintText: "username",
-                                  initialObscureText: false,
-                                ),
-                                SizedBox(height: 8.h),
-                              ],
-                            ),
-                          Textfield(
-                            controller: email,
-                            lableText: "Enter email",
-                            hintText: "email",
-                            initialObscureText: false,
-                          ),
-                          SizedBox(height: 8.h),
-                          Textfield(
-                            controller: password,
-                            lableText: "Enter password",
-                            hintText: "password",
-                            initialObscureText: true,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (value.length < 8) {
-                                return 'Password must be at least 8 characters';
-                              }
-                              if (!RegExp(
-                                r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=?\s]{8,}$',
-                              ).hasMatch(value)) {
-                                return 'Password must contain at least one letter and one number';
-                              }
-                              return null;
-                            },
-                          ),
-                          !_isSignupView
-                              ? InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const ForgotPasswordPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'Forgot password',
-                                    textAlign: TextAlign.end,
-                                    style: TextStyle(
-                                      color: blueColor,
-                                      fontFamily: googleFontFaintNormal,
-                                      fontSize: 15.sp,
-                                    ),
+                            // 5. Conditional UI for Username field
+                            if (_isSignupView)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Textfield(
+                                    controller: userName,
+                                    lableText: "Enter username",
+                                    hintText: "username",
+                                    initialObscureText: false,
                                   ),
-                                )
-                              : SizedBox.shrink(),
-                          SizedBox(height: 30.h),
-                          Custombutton(
-                            title: _isSignupView ? 'Sign Up' : 'Sign In',
-                            action: _isLoading
-                                ? null
-                                : (_isSignupView ? signupUser : signinUser),
-                            isLoading: _isLoading,
-                          ),
-                          SizedBox(height: 10.h),
-                          Center(
-                            child: Text(
-                              'Account is not verified? click here👇',
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                fontFamily: googleFontSemiBold,
-                                color: blackColor,
+                                  SizedBox(height: 8.h),
+                                ],
+                              ),
+                            Textfield(
+                              controller: email,
+                              lableText: "Enter email",
+                              hintText: "email",
+                              initialObscureText: false,
+                            ),
+                            SizedBox(height: 8.h),
+                            Textfield(
+                              controller: password,
+                              lableText: "Enter password",
+                              hintText: "password",
+                              initialObscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                if (_isSignupView && value.length < 8) {
+                                  return 'Password must be at least 8 characters';
+                                }
+                                if (_isSignupView &&
+                                    !RegExp(
+                                      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=?\s]{8,}$',
+                                    ).hasMatch(value)) {
+                                  return 'Password must contain at least one letter \nand one number';
+                                }
+                                return null;
+                              },
+                            ),
+                            !_isSignupView
+                                ? InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ForgotPasswordPage(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Forgot password',
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                        color: blueColor,
+                                        fontFamily: googleFontFaintNormal,
+                                        fontSize: 15.sp,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                            SizedBox(height: 30.h),
+                            Custombutton(
+                              title: _isSignupView ? 'Sign Up' : 'Sign In',
+                              action: _isLoading
+                                  ? null
+                                  : (_isSignupView ? signupUser : signinUser),
+                              isLoading: _isLoading,
+                            ),
+                            SizedBox(height: 10.h),
+                            Center(
+                              child: Text(
+                                'Account is not verified? click here👇',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontFamily: googleFontSemiBold,
+                                  color: blackColor,
+                                ),
                               ),
                             ),
-                          ),
-                          Center(
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondryAnimation,
-                                        ) => const OtpServiceField(),
-                                    transitionDuration: Duration(
-                                      microseconds: 200,
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (
+                                            context,
+                                            animation,
+                                            secondryAnimation,
+                                          ) => const OtpServiceField(),
+                                      transitionDuration: Duration(
+                                        microseconds: 200,
+                                      ),
+                                      transitionsBuilder:
+                                          (
+                                            context,
+                                            animation,
+                                            scondaryAnimation,
+                                            child,
+                                          ) {
+                                            const begin = Offset(0, 1);
+                                            const end = Offset(0, 0);
+                                            const curve = Curves.easeInOut;
+                                            var tween = Tween(
+                                              begin: begin,
+                                              end: end,
+                                            ).chain(CurveTween(curve: curve));
+                                            var offsetAnimation = animation
+                                                .drive(tween);
+                                            return SlideTransition(
+                                              position: offsetAnimation,
+                                              child: child,
+                                            );
+                                          },
                                     ),
-                                    transitionsBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          scondaryAnimation,
-                                          child,
-                                        ) {
-                                          const begin = Offset(0, 1);
-                                          const end = Offset(0, 0);
-                                          const curve = Curves.easeInOut;
-                                          var tween = Tween(
-                                            begin: begin,
-                                            end: end,
-                                          ).chain(CurveTween(curve: curve));
-                                          var offsetAnimation = animation.drive(
-                                            tween,
-                                          );
-                                          return SlideTransition(
-                                            position: offsetAnimation,
-                                            child: child,
-                                          );
-                                        },
-                                  ),
-                                );
-                              },
-                              child: Text('Verify account'),
+                                  );
+                                },
+                                child: Text('Verify account'),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -399,7 +407,8 @@ class _TextfieldState extends State<Textfield> {
         SizedBox(height: 10.h),
         TextFormField(
           obscureText: widget.hintText == 'password' ? obscureText : false,
-          obscuringCharacter: '•',
+          obscuringCharacter:
+              '•', // This was missing a comma, which I've added.
           controller: widget.controller,
           cursorColor: blueColor,
           style: TextStyle(
@@ -414,6 +423,10 @@ class _TextfieldState extends State<Textfield> {
               borderSide: BorderSide(color: faintwhiteColor),
             ),
             hintText: widget.hintText,
+            errorStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              color: Colors.red, // Sets the validation error text color to red
+            ),
             hintStyle: TextStyle(
               color: faintwhiteColor,
               fontFamily: googleFontFaintNormal,

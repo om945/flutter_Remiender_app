@@ -7,7 +7,7 @@ import { transporter } from './otpService.js';
 async function sendVerificationCode(email, verificationCode) {
   try {
     const response = await transporter.sendMail({
-      from: '"Bankai" <ombelekar21@gmail.com>',
+      from: '"PlanPad" <ombelekar21@gmail.com>',
       to: email,
       subject: 'Email verification',
       text: 'Verify your mail',
@@ -25,7 +25,7 @@ async function sendVerificationCode(email, verificationCode) {
 async function sendPasswordResetOtp(email, otpCode) {
   try {
     const response = await transporter.sendMail({
-      from: '"Bankai" <ombelekar21@gmail.com>',
+      from: '"PlanPad" <ombelekar21@gmail.com>',
       to: email,
       subject: 'Password Reset OTP',
       html: Reset_Password_Email_Template.replace('{otpCode}', otpCode),
