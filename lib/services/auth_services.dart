@@ -244,7 +244,7 @@ class AuthServices {
 
       if (token == null || token.isEmpty) {
         await pref.setString('x-auth-token', '');
-        return; 
+        return;
       }
 
       // Validate token
@@ -310,7 +310,9 @@ class AuthServices {
   }) async {
     try {
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/reverification'),
+        Uri.parse(
+          '${Constants.uri}/api/reverification',
+        ), // Corrected typo from evaification to reverification
         body: jsonEncode({'email': email}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -339,10 +341,7 @@ class AuthServices {
     try {
       http.Response res = await http.post(
         Uri.parse('${Constants.uri}/api/verification'),
-        body: jsonEncode({
-          'email': email,
-          'code': otp,
-        }),
+        body: jsonEncode({'email': email, 'code': otp}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

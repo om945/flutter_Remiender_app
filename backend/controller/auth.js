@@ -54,15 +54,16 @@ async function handleSignIn(req, res) {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    const isVerify = await user.isVerify;
-    if (isVerify == false) {
-      return res.status(400).json({ msg: 'User is not verified' });
-    }
+
     if (!user) {
       return res
         .status(400)
         .json({ msg: 'User with is email does not exist!' });
     }
+    if (user.isVerify == false) {
+      return res.status(400).json({ msg: 'User is not verified' });
+    }
+
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: 'Incorrrect username or password' });
@@ -214,12 +215,16 @@ async function handleResendVerificationCode(req, res) {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
+      // To prevent email enumeration, we send a generic success message
+      // even if the user doesn't exist.
       return res
-        .status(404)
-        .json({ msg: 'User with this email does not exist!' });
+        .status(200)
+        .json({
+          msg: 'If a matching account exists, a new verification code has been sent.',
+        });
     }
 
-    if (user.isVerify) {
+    if (user.isVerify === true) {
       return res.status(400).json({ msg: 'This account is already verified.' });
     }
 
