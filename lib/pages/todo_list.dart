@@ -32,6 +32,8 @@ class _TodoListState extends State<TodoList> {
   bool _isSelectionMode = false;
   final Set<String> _selectedTodoIds = {};
 
+  bool _isSaving = false; // Add this line
+
   @override
   void initState() {
     super.initState();
@@ -61,9 +63,9 @@ class _TodoListState extends State<TodoList> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
-              primary: blueColor, 
+              primary: blueColor,
               onPrimary: blackColor,
-              surface: blackColor, 
+              surface: blackColor,
               onSurface: whiteColor,
             ),
             textButtonTheme: TextButtonThemeData(
@@ -92,14 +94,12 @@ class _TodoListState extends State<TodoList> {
           data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
               primary: blueColor,
-              onPrimary: blackColor, 
-              surface: blackColor, 
+              onPrimary: blackColor,
+              surface: blackColor,
               onSurface: whiteColor,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: blueColor, 
-              ),
+              style: TextButton.styleFrom(foregroundColor: blueColor),
             ),
           ),
           child: child!,
@@ -116,6 +116,9 @@ class _TodoListState extends State<TodoList> {
   bool _isLoading = false;
 
   void addTodo({String? todoId}) async {
+    if (_isSaving) return; // Prevent multiple calls
+
+    _isSaving = true;
     DateTime? reminderDateTime;
     if (_selectedDate != null && _selectedTime != null) {
       reminderDateTime = DateTime(
@@ -127,15 +130,19 @@ class _TodoListState extends State<TodoList> {
       );
     }
 
-    await todoService.addTodo(
-      context: context,
-      content: toDoController.text.trim(),
-      isUpdate: todoId != null && todoId.isNotEmpty,
-      todoId: todoId,
-      reminderDate: reminderDateTime,
-    );
-    if (!mounted) return;
-    Navigator.pop(context); // Close the modal after saving
+    try {
+      await todoService.addTodo(
+        context: context,
+        content: toDoController.text.trim(),
+        isUpdate: todoId != null && todoId.isNotEmpty,
+        todoId: todoId,
+        reminderDate: reminderDateTime,
+      );
+      if (!mounted) return;
+      Navigator.pop(context); // Close the modal after saving
+    } finally {
+      _isSaving = false; // Reset the flag after completion or error
+    }
   }
 
   Future<void> _loadData() async {
@@ -144,7 +151,7 @@ class _TodoListState extends State<TodoList> {
     setState(() {
       _isLoading = true;
     });
-    
+
     await Provider.of<TodoProvider>(
       context,
       listen: false,
@@ -280,13 +287,18 @@ class _TodoListState extends State<TodoList> {
                       textAlign: TextAlign.center,
                     ),
                     TextButton(
-                      onPressed: () {
-                        addTodo(todoId: todoId);
-                      },
+                      onPressed: _isSaving
+                          ? null
+                          : () {
+                              // Disable button while saving
+                              addTodo(todoId: todoId);
+                            },
                       child: Text(
                         'Save',
                         style: TextStyle(
-                          color: blueColor,
+                          color: _isSaving
+                              ? Colors.grey
+                              : blueColor, // Change color when disabled
                           fontFamily: googleFontSemiBold,
                           fontSize: 14.sp,
                         ),
@@ -455,18 +467,89 @@ class _TodoListState extends State<TodoList> {
                   backgroundColor: blueColor,
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),
                 ),
-          body: Builder(
-            builder: (context) {
-              if (todoProvider.todos.isEmpty) {
-                return RefreshIndicator(
-                  onRefresh: _loadData,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height / 4,
+          body: RefreshIndicator(
+            onRefresh: _loadData,
+            child: CustomScrollView(
+              slivers: [
+                SliverList.builder(
+                  itemCount: incompleteTodos.length,
+                  itemBuilder: (context, index) {
+                    final todo = incompleteTodos[index];
+                    return TodoListUi(
+                      content: todo.content,
+                      date: formatTime(
+                        todo.createdAt,
+                        reminderDate: todo.reminderDate,
+                      ),
+                      todoId: todo.id,
+                      isSelectionMode: _isSelectionMode,
+                      isSelected: _selectedTodoIds.contains(todo.id),
+                      isCompleted: todo.isCompleted ?? false,
+                      onTap: () => _onTodoTap(todo),
+                      onLongPress: () => _onTodoLongPress(todo.id),
+                      onCompletionChanged: (value) {
+                        if (value != null) {
+                          todoProvider.updateTodoCompletionStatus(
+                            context,
+                            todo.id,
+                            value,
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
+                if (completedTodos.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: 20.h,
+                        left: 5,
+                        bottom: 10.h,
+                      ),
+                      child: Text(
+                        'Completed Todos (${completedTodos.length})',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontFamily: googleFontNormal,
+                          color: whiteColor,
+                        ),
+                      ),
                     ),
+                  ),
+                SliverList.builder(
+                  itemCount: completedTodos.length,
+                  itemBuilder: (context, index) {
+                    final todo = completedTodos[index];
+                    return TodoListUi(
+                      content: todo.content,
+                      date: formatTime(
+                        todo.createdAt,
+                        reminderDate: todo.reminderDate,
+                      ),
+                      todoId: todo.id,
+                      isSelectionMode: _isSelectionMode,
+                      isSelected: _selectedTodoIds.contains(todo.id),
+                      isCompleted: todo.isCompleted ?? false,
+                      onTap: () => _onTodoTap(todo),
+                      onLongPress: () => _onTodoLongPress(todo.id),
+                      onCompletionChanged: (value) {
+                        if (value != null) {
+                          todoProvider.updateTodoCompletionStatus(
+                            context,
+                            todo.id,
+                            value,
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
+                if (todos.isEmpty)
+                  SliverToBoxAdapter(
                     child: Center(
                       child: Text(
-                        'No Todos yet',
+                        'No todos yet',
                         style: TextStyle(
                           fontSize: 20.sp,
                           fontFamily: googleFontNormal,
@@ -475,102 +558,8 @@ class _TodoListState extends State<TodoList> {
                       ),
                     ),
                   ),
-                );
-              }
-              if (widget.searchQuery.isNotEmpty && filterTodos.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No results found',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontFamily: googleFontNormal,
-                      color: whiteColor,
-                    ),
-                  ),
-                );
-              }
-              return RefreshIndicator(
-                onRefresh: _loadData,
-                child: CustomScrollView(
-                  slivers: [
-                    SliverList.builder(
-                      itemCount: incompleteTodos.length,
-                      itemBuilder: (context, index) {
-                        final todo = incompleteTodos[index];
-                        return TodoListUi(
-                          content: todo.content,
-                          date: formatTime(
-                            todo.createdAt,
-                            reminderDate: todo.reminderDate,
-                          ),
-                          todoId: todo.id,
-                          isSelectionMode: _isSelectionMode,
-                          isSelected: _selectedTodoIds.contains(todo.id),
-                          isCompleted: todo.isCompleted ?? false,
-                          onTap: () => _onTodoTap(todo),
-                          onLongPress: () => _onTodoLongPress(todo.id),
-                          onCompletionChanged: (value) {
-                            if (value != null) {
-                              todoProvider.updateTodoCompletionStatus(
-                                context,
-                                todo.id,
-                                value,
-                              );
-                            }
-                          },
-                        );
-                      },
-                    ),
-                    if (completedTodos.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: 20.h,
-                            left: 5,
-                            bottom: 10.h,
-                          ),
-                          child: Text(
-                            'Completed Todos (${completedTodos.length})',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontFamily: googleFontNormal,
-                              color: whiteColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    SliverList.builder(
-                      itemCount: completedTodos.length,
-                      itemBuilder: (context, index) {
-                        final todo = completedTodos[index];
-                        return TodoListUi(
-                          content: todo.content,
-                          date: formatTime(
-                            todo.createdAt,
-                            reminderDate: todo.reminderDate,
-                          ),
-                          todoId: todo.id,
-                          isSelectionMode: _isSelectionMode,
-                          isSelected: _selectedTodoIds.contains(todo.id),
-                          isCompleted: todo.isCompleted ?? false,
-                          onTap: () => _onTodoTap(todo),
-                          onLongPress: () => _onTodoLongPress(todo.id),
-                          onCompletionChanged: (value) {
-                            if (value != null) {
-                              todoProvider.updateTodoCompletionStatus(
-                                context,
-                                todo.id,
-                                value,
-                              );
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
+              ],
+            ),
           ),
         );
       },

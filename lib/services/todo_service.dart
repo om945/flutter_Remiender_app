@@ -262,7 +262,7 @@ class TodoService {
         ),
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'Todo Deletd!');
+          showSnackBar(context, 'Todo Deleted!');
         },
       );
     } catch (e) {

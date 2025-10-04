@@ -19,6 +19,7 @@ class _AddNotePageState extends State<AddNotePage> {
   final TextEditingController headlineController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final NoteService noteService = NoteService();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -33,19 +34,25 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void addNote() async {
-    await noteService.addNote(
-      context: context,
-      noteId: widget.noteId,
-      headline: headlineController.text.trim(),
-      content: contentController.text.trim(),
-      isUpdate:
-          widget.noteId != null &&
-          widget.noteId!.isNotEmpty, // Check if editing
-    );
+    if (_isSaving) return;
+    _isSaving = true;
+    try {
+      await noteService.addNote(
+        context: context,
+        noteId: widget.noteId,
+        headline: headlineController.text.trim(),
+        content: contentController.text.trim(),
+        isUpdate:
+            widget.noteId != null &&
+            widget.noteId!.isNotEmpty, // Check if editing
+      );
 
-    // Refresh the notes list
-    if (mounted) {
-      Navigator.of(context).pop(true);
+      // Refresh the notes list
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } finally {
+      _isSaving = false;
     }
   }
 
@@ -62,7 +69,7 @@ class _AddNotePageState extends State<AddNotePage> {
         ), // Show appropriate title
         actions: [
           IconButton(
-            onPressed: addNote,
+            onPressed: _isSaving ? null : addNote,
             icon: Icon(
               isEditing ? Icons.save_as_outlined : Icons.save_outlined,
             ),

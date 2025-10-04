@@ -87,7 +87,6 @@ class _NotesListState extends State<NotesList> {
         }
       });
     } else {
-      // Navigate to edit page
       final result = await Navigator.of(context).push(
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => AddNotePage(
@@ -325,43 +324,50 @@ class _NotesListState extends State<NotesList> {
                   },
                   child: Icon(Icons.add, color: blackColor, size: 30.sp),
                 ),
-          body: Builder(builder: (context) {
-            if (notes.isEmpty) {
-              return RefreshIndicator(
-                onRefresh: _loadData,
-                child: ListView(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height / 4),
-                      child: Center(
-                        child: Text(
-                          'No notes yet',
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontFamily: googleFontNormal,
-                            color: whiteColor,
+          body: Builder(
+            builder: (context) {
+              if (notes.isEmpty) {
+                return RefreshIndicator(
+                  onRefresh: _loadData,
+                  child: ListView(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height / 4,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'No notes yet',
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontFamily: googleFontNormal,
+                              color: whiteColor,
+                            ),
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                );
+              }
+              if (widget.searchQuery.isNotEmpty && filteredNotes.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No results found',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontFamily: googleFontNormal,
+                      color: whiteColor,
                     ),
-                  ],
-                ),
+                  ),
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: _loadData,
+                child: ListView(children: noteWidgets),
               );
-            }
-            if (widget.searchQuery.isNotEmpty && filteredNotes.isEmpty) {
-              return Center(
-                  child: Text('No results found',
-                      style: TextStyle(
-                          fontSize: 20.sp,
-                          fontFamily: googleFontNormal,
-                          color: whiteColor)));
-            }
-            return RefreshIndicator(
-              onRefresh: _loadData,
-              child: ListView(children: noteWidgets),
-            );
-          }),
+            },
+          ),
         );
       },
     );
