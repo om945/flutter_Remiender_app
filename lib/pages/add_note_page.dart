@@ -35,7 +35,7 @@ class _AddNotePageState extends State<AddNotePage> {
   void addNote() async {
     await noteService.addNote(
       context: context,
-      noteId: widget.noteId, 
+      noteId: widget.noteId,
       headline: headlineController.text.trim(),
       content: contentController.text.trim(),
       isUpdate:
@@ -63,7 +63,9 @@ class _AddNotePageState extends State<AddNotePage> {
         actions: [
           IconButton(
             onPressed: addNote,
-            icon: Icon(isEditing ? Icons.update : Icons.save_alt_rounded),
+            icon: Icon(
+              isEditing ? Icons.save_as_outlined : Icons.save_outlined,
+            ),
             tooltip: isEditing ? 'Update Note' : 'Save Note',
           ),
         ],
