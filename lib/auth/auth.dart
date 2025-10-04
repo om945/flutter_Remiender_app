@@ -443,22 +443,7 @@ class _TextfieldState extends State<Textfield> {
                   )
                 : null,
           ),
-          validator: widget.hintText == 'password'
-              ? (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  if (value.length < 8) {
-                    return 'Password must be at least 8 characters';
-                  }
-                  if (!RegExp(
-                    r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=?\s]{8,}$',
-                  ).hasMatch(value)) {
-                    return 'Password must contain at least one letter and one number';
-                  }
-                  return null;
-                }
-              : widget.validator,
+          validator: widget.validator,
         ),
       ],
     );

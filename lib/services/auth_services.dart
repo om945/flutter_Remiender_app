@@ -35,6 +35,9 @@ class AuthServices {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+      if (name.isEmpty || email.isEmpty || password.isEmpty) {
+        return showSnackBar(context, 'Please fill all required fileds');
+      }
       httpErrorHandle(
         response: res,
         context: context,
