@@ -52,53 +52,59 @@ class NotesListUi extends StatelessWidget {
                   side: const BorderSide(color: whiteColor),
                 ),
               ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    isFavorite
-                        ? Icon(Icons.star, color: whiteColor, size: 15.sp)
-                        : SizedBox.shrink(),
-                    isFavorite ? SizedBox(width: 5.w) : SizedBox.shrink(),
-                    Text(
-                      headline.isEmpty ? content : headline,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontFamily: googleFontSemiBold,
-                        color: whiteColor,
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      isFavorite
+                          ? Icon(Icons.star, color: whiteColor, size: 15.sp)
+                          : SizedBox.shrink(),
+                      isFavorite ? SizedBox(width: 5.w) : SizedBox.shrink(),
+                      Expanded(
+                        child: Text(
+                          headline.isEmpty ? content : headline,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontFamily: googleFontSemiBold,
+                            color: whiteColor,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                Row(
-                  children: [
-                    Text(
-                      date,
-                      style: TextStyle(
-                        fontFamily: googleFontFaintNormal,
-                        color: faintwhiteColor,
-                        fontSize: 14.sp,
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    children: [
+                      Text(
+                        date,
+                        style: TextStyle(
+                          fontFamily: googleFontFaintNormal,
+                          color: faintwhiteColor,
+                          fontSize: 14.sp,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 15.w),
-                    Text(
-                      content,
-                      style: TextStyle(
-                        fontFamily: googleFontFaintNormal,
-                        color: faintwhiteColor,
-                        fontSize: 15.sp,
+                      SizedBox(width: 15.w),
+                      Expanded(
+                        child: Text(
+                          content,
+                          style: TextStyle(
+                            fontFamily: googleFontFaintNormal,
+                            color: faintwhiteColor,
+                            fontSize: 15.sp,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
