@@ -464,24 +464,20 @@ class _TodoListState extends State<TodoList> {
               if (todoProvider.todos.isEmpty) {
                 return RefreshIndicator(
                   onRefresh: _loadData,
-                  child: ListView(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height / 4,
-                        ),
-                        child: Center(
-                          child: Text(
-                            'No Todos yet',
-                            style: TextStyle(
-                              fontSize: 20.sp,
-                              fontFamily: googleFontNormal,
-                              color: whiteColor,
-                            ),
-                          ),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height / 4,
+                    ),
+                    child: Center(
+                      child: Text(
+                        'No Todos yet',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontFamily: googleFontNormal,
+                          color: whiteColor,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 );
               }

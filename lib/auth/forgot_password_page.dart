@@ -85,7 +85,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             controller: emailController,
                             lableText: 'Email',
                             hintText: 'Enter your email',
-                            obscureText: false,
+                            initialObscureText: false,
                           ),
                           SizedBox(height: 30.h),
                           Custombutton(title: 'Send OTP', action: sendOtp),

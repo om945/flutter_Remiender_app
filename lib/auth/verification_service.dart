@@ -167,7 +167,7 @@ class _OtpServiceFieldState extends State<OtpServiceField> {
                               lableText: 'Email',
                               hintText: 'Enter email',
                               controller: _emailController,
-                              obscureText: false,
+                              initialObscureText: false,
                             ),
                           SizedBox(height: 30.h),
                           Pinput(

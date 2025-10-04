@@ -224,7 +224,7 @@ class _SignupPageState extends State<SignupPage> {
                                   controller: userName,
                                   lableText: "Enter username",
                                   hintText: "username",
-                                  obscureText: false,
+                                  initialObscureText: false,
                                 ),
                                 SizedBox(height: 8.h),
                               ],
@@ -233,14 +233,28 @@ class _SignupPageState extends State<SignupPage> {
                             controller: email,
                             lableText: "Enter email",
                             hintText: "email",
-                            obscureText: false,
+                            initialObscureText: false,
                           ),
                           SizedBox(height: 8.h),
                           Textfield(
                             controller: password,
                             lableText: "Enter password",
                             hintText: "password",
-                            obscureText: true,
+                            initialObscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              if (value.length < 8) {
+                                return 'Password must be at least 8 characters';
+                              }
+                              if (!RegExp(
+                                r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=?\s]{8,}$',
+                              ).hasMatch(value)) {
+                                return 'Password must contain at least one letter and one number';
+                              }
+                              return null;
+                            },
                           ),
                           !_isSignupView
                               ? InkWell(
@@ -341,19 +355,33 @@ class _SignupPageState extends State<SignupPage> {
 // No changes needed for these widgets below
 
 //Textfield
-class Textfield extends StatelessWidget {
+class Textfield extends StatefulWidget {
   final String lableText;
   final String hintText;
   final TextEditingController controller;
-  final bool obscureText;
+  final bool initialObscureText;
+  final String? Function(String?)? validator;
 
   const Textfield({
     super.key,
     required this.lableText,
     required this.hintText,
     required this.controller,
-    required this.obscureText,
+    required this.initialObscureText,
+    this.validator,
   });
+
+  @override
+  State<Textfield> createState() => _TextfieldState();
+}
+
+class _TextfieldState extends State<Textfield> {
+  bool obscureText = true;
+  @override
+  void initState() {
+    super.initState();
+    obscureText = widget.initialObscureText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -361,7 +389,7 @@ class Textfield extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          lableText,
+          widget.lableText,
           style: TextStyle(
             color: bgColor,
             fontFamily: googleFontSemiBold,
@@ -370,9 +398,9 @@ class Textfield extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         TextFormField(
-          obscureText: obscureText,
+          obscureText: widget.hintText == 'password' ? obscureText : false,
           obscuringCharacter: '•',
-          controller: controller,
+          controller: widget.controller,
           cursorColor: blueColor,
           style: TextStyle(
             fontSize: 14.sp,
@@ -385,7 +413,7 @@ class Textfield extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: faintwhiteColor),
             ),
-            hintText: hintText,
+            hintText: widget.hintText,
             hintStyle: TextStyle(
               color: faintwhiteColor,
               fontFamily: googleFontFaintNormal,
@@ -401,7 +429,36 @@ class Textfield extends StatelessWidget {
               gapPadding: 5,
               borderRadius: BorderRadius.circular(7.r),
             ),
+            suffixIcon: widget.hintText == 'password'
+                ? IconButton(
+                    onPressed: () {
+                      setState(() {
+                        obscureText = !obscureText;
+                      });
+                    },
+                    icon: Icon(
+                      obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: blueColor,
+                    ),
+                  )
+                : null,
           ),
+          validator: widget.hintText == 'password'
+              ? (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 8) {
+                    return 'Password must be at least 8 characters';
+                  }
+                  if (!RegExp(
+                    r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=?\s]{8,}$',
+                  ).hasMatch(value)) {
+                    return 'Password must contain at least one letter and one number';
+                  }
+                  return null;
+                }
+              : widget.validator,
         ),
       ],
     );

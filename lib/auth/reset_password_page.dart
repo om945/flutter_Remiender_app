@@ -102,14 +102,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             controller: newPasswordController,
                             lableText: 'New Password',
                             hintText: 'Enter new password',
-                            obscureText: true,
+                            initialObscureText: true,
                           ),
                           SizedBox(height: 10.h),
                           Textfield(
                             controller: confirmNewPasswordController,
                             lableText: 'Confirm New Password',
                             hintText: 'Confirm new password',
-                            obscureText: true,
+                            initialObscureText: true,
                           ),
                           SizedBox(height: 30.h),
                           Custombutton(
